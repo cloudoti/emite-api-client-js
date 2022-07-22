@@ -1,8 +1,8 @@
 {
-  "name": "emite-api",
-  "version": "1.0.0",
-  "description": "calculo y generación de JSON para API Emite",
-  "main": "dist.emite-api.js",
+  "name": "emite-api-client-js",
+  "version": "0.0.5",
+  "description": "calculo y consumo de la API Emite",
+  "main": "dist/emite-api.js",
   "files": [
     "dist/**/*"
   ],
