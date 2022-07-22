@@ -1,14 +1,14 @@
-import { Decimal } from "decimal.js";
-import { numeroALetras } from "./monto-letras";
-import EmiteApi from "../../emite-api";
+import { Decimal } from 'decimal.js';
+import { numeroALetras } from './monto-letras';
+import EmiteApi from '../../emite-api';
 import {
   obtenerIgv,
   obtenerMontoSinIgv,
   obtenerPorcentajeDetraccion,
   obtenerValorPorcentaje,
   obterMontoConIgv,
-} from "./funciones";
-import {CodigoDetraccion, CodigoTipoAfectacionIgv} from "./types";
+} from './funciones';
+import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
 
 export class Documento {
   private _cabecera?: Cabecera;
@@ -275,12 +275,8 @@ class DetraccionTransporte {
   public get valorReferencial(): string | undefined {
     return this._valorReferencial;
   }
-  public agregarValorReferencial(
-    valorReferencial?: string
-  ): DetraccionTransporte {
-    this._valorReferencial = new Decimal(
-      valorReferencial ? valorReferencial : 0
-    ).toFixed(2);
+  public agregarValorReferencial(valorReferencial?: string): DetraccionTransporte {
+    this._valorReferencial = new Decimal(valorReferencial ? valorReferencial : 0).toFixed(2);
     return this;
   }
 
@@ -288,11 +284,9 @@ class DetraccionTransporte {
   public get valorReferencialCargaEfectiva(): string | undefined {
     return this._valorReferencialCargaEfectiva;
   }
-  public agregarValorReferencialCargaEfectiva(
-    valorReferencialCargaEfectiva?: string
-  ): DetraccionTransporte {
+  public agregarValorReferencialCargaEfectiva(valorReferencialCargaEfectiva?: string): DetraccionTransporte {
     this._valorReferencialCargaEfectiva = new Decimal(
-      valorReferencialCargaEfectiva ? valorReferencialCargaEfectiva : 0
+      valorReferencialCargaEfectiva ? valorReferencialCargaEfectiva : 0,
     ).toFixed(2);
     return this;
   }
@@ -301,12 +295,8 @@ class DetraccionTransporte {
   public get valorReferencialCargaUtil(): string | undefined {
     return this._valorReferencialCargaUtil;
   }
-  public agregarValorReferencialCargaUtil(
-    valorReferencialCargaUtil?: string
-  ): DetraccionTransporte {
-    this._valorReferencialCargaUtil = new Decimal(
-      valorReferencialCargaUtil ? valorReferencialCargaUtil : 0
-    ).toFixed(2);
+  public agregarValorReferencialCargaUtil(valorReferencialCargaUtil?: string): DetraccionTransporte {
+    this._valorReferencialCargaUtil = new Decimal(valorReferencialCargaUtil ? valorReferencialCargaUtil : 0).toFixed(2);
     return this;
   }
 
@@ -930,9 +920,7 @@ export class Cabecera {
   }
 
   private _codigoDetraccion?: string;
-  public agregarCodigoDetraccion(
-    codigoDetraccion?: CodigoDetraccion
-  ): Cabecera {
+  public agregarCodigoDetraccion(codigoDetraccion?: CodigoDetraccion): Cabecera {
     this._codigoDetraccion = codigoDetraccion;
     return this;
   }
@@ -944,59 +932,43 @@ export class Cabecera {
   }
 
   private _valorReferencialDetraccion?: string;
-  public agregarValorReferencialDetraccion(
-    valorReferencialDetraccion?: string
-  ): Cabecera {
+  public agregarValorReferencialDetraccion(valorReferencialDetraccion?: string): Cabecera {
     this._valorReferencialDetraccion = valorReferencialDetraccion;
     return this;
   }
 
   private _valorReferencialCargaEfectivaDetraccion?: string;
-  public agregarValorReferencialCargaEfectivaDetraccion(
-    valorReferencialCargaEfectivaDetraccion?: string
-  ): Cabecera {
-    this._valorReferencialCargaEfectivaDetraccion =
-      valorReferencialCargaEfectivaDetraccion;
+  public agregarValorReferencialCargaEfectivaDetraccion(valorReferencialCargaEfectivaDetraccion?: string): Cabecera {
+    this._valorReferencialCargaEfectivaDetraccion = valorReferencialCargaEfectivaDetraccion;
     return this;
   }
 
   private _valorReferencialCargaUtilDetraccion?: string;
-  public agregarValorReferencialCargaUtilDetraccion(
-    valorReferencialCargaUtilDetraccion?: string
-  ): Cabecera {
-    this._valorReferencialCargaUtilDetraccion =
-      valorReferencialCargaUtilDetraccion;
+  public agregarValorReferencialCargaUtilDetraccion(valorReferencialCargaUtilDetraccion?: string): Cabecera {
+    this._valorReferencialCargaUtilDetraccion = valorReferencialCargaUtilDetraccion;
     return this;
   }
 
   private _ubigeoOrigenDetraccion?: string;
-  public agregarUbigeoOrigenDetraccion(
-    ubigeoOrigenDetraccion?: string
-  ): Cabecera {
+  public agregarUbigeoOrigenDetraccion(ubigeoOrigenDetraccion?: string): Cabecera {
     this._ubigeoOrigenDetraccion = ubigeoOrigenDetraccion;
     return this;
   }
 
   private _puntoOrigenDetraccion?: string;
-  public agregarPuntoOrigenDetraccion(
-    puntoOrigenDetraccion?: string
-  ): Cabecera {
+  public agregarPuntoOrigenDetraccion(puntoOrigenDetraccion?: string): Cabecera {
     this._puntoOrigenDetraccion = puntoOrigenDetraccion;
     return this;
   }
 
   private _ubigeoDestinoDetraccion?: string;
-  public agregarUbigeoDestinoDetraccion(
-    ubigeoDestinoDetraccion?: string
-  ): Cabecera {
+  public agregarUbigeoDestinoDetraccion(ubigeoDestinoDetraccion?: string): Cabecera {
     this._ubigeoDestinoDetraccion = ubigeoDestinoDetraccion;
     return this;
   }
 
   private _puntoDestinoDetraccion?: string;
-  public agregarPuntoDestinoDetraccion(
-    puntoDestinoDetraccion?: string
-  ): Cabecera {
+  public agregarPuntoDestinoDetraccion(puntoDestinoDetraccion?: string): Cabecera {
     this._puntoDestinoDetraccion = puntoDestinoDetraccion;
     return this;
   }
@@ -1082,39 +1054,28 @@ export class Cabecera {
     let totalCantidadIcbper = new Decimal(0);
 
     detalle?.forEach((item: Detalle) => {
-      if (
-        item.cantidad &&
-        item.valorUnitario &&
-        item.precioVentaUnitario &&
-        item.igv
-      ) {
+      if (item.cantidad && item.valorUnitario && item.precioVentaUnitario && item.igv) {
         let totalDetalleIcbper = new Decimal(0.0);
         if (item.icbp) {
           totalDetalleIcbper = totalDetalleIcbper.add(
-            new Decimal(EmiteApi.configuracion.valorIcbper!).mul(
-              new Decimal(item.cantidad)
-            )
+            new Decimal(EmiteApi.configuracion.valorIcbper!).mul(new Decimal(item.cantidad)),
           );
           totalIcbper = totalIcbper.add(totalDetalleIcbper);
-          totalCantidadIcbper = totalCantidadIcbper.add(
-            new Decimal(item.cantidad)
-          );
+          totalCantidadIcbper = totalCantidadIcbper.add(new Decimal(item.cantidad));
         }
 
         switch (item.igv?.codigoTipoAfectacionIgv) {
-          case "10":
+          case '10':
             totalGravado = totalGravado.add(new Decimal(item.valorVenta!));
             break;
-          case "20":
+          case '20':
             totalExonerado = totalExonerado.add(new Decimal(item.valorVenta!));
             break;
-          case "30":
+          case '30':
             totalInafecto = totalInafecto.add(new Decimal(item.valorVenta!));
             break;
-          case "40":
-            totalExportacion = totalExportacion.add(
-              new Decimal(item.valorVenta!)
-            );
+          case '40':
+            totalExportacion = totalExportacion.add(new Decimal(item.valorVenta!));
             break;
           default:
             totalGratuito = totalGratuito.add(new Decimal(item.valorVenta!));
@@ -1122,9 +1083,7 @@ export class Cabecera {
               parseInt(item.igv?.codigoTipoAfectacionIgv!) > 10 &&
               parseInt(item.igv?.codigoTipoAfectacionIgv!) < 20
             ) {
-              totalGratuitoGravado = totalGratuitoGravado.add(
-                new Decimal(item.valorVenta!)
-              );
+              totalGratuitoGravado = totalGratuitoGravado.add(new Decimal(item.valorVenta!));
             }
         }
       }
@@ -1138,22 +1097,13 @@ export class Cabecera {
 
     this.agregarIgv(
       Igv.crear()
-        .agregarMonto(
-          obtenerIgv(obterMontoConIgv(totalGravado.valueOf(), "10"), "10").monto
-        )
-        .agregarMontoGratuito(
-          obtenerIgv(
-            obterMontoConIgv(totalGratuitoGravado.valueOf(), "10"),
-            "10"
-          ).monto
-        )
+        .agregarMonto(obtenerIgv(obterMontoConIgv(totalGravado.valueOf(), '10'), '10').monto)
+        .agregarMontoGratuito(obtenerIgv(obterMontoConIgv(totalGratuitoGravado.valueOf(), '10'), '10').monto),
     );
 
     if (totalIcbper.greaterThan(0)) {
       this.agregarIcbper(
-        Icbper.crear()
-          .agregarMonto(EmiteApi.configuracion.valorIcbper!)
-          .agregarCantidad(totalCantidadIcbper.valueOf())
+        Icbper.crear().agregarMonto(EmiteApi.configuracion.valorIcbper!).agregarCantidad(totalCantidadIcbper.valueOf()),
       );
     }
 
@@ -1177,9 +1127,7 @@ export class Cabecera {
       if (this._porcentajeDetraccion) {
         porcentajeDetraccion = this._porcentajeDetraccion;
       } else {
-        porcentajeDetraccion = obtenerPorcentajeDetraccion(
-          this._codigoDetraccion!
-        );
+        porcentajeDetraccion = obtenerPorcentajeDetraccion(this._codigoDetraccion!);
       }
       if (porcentajeDetraccion) {
         this.agregarDetraccion(
@@ -1189,26 +1137,20 @@ export class Cabecera {
             .agregarCuenta(EmiteApi.configuracion.cuentaDetracciones)
             .agregarTipoMoneda(this._tipoMoneda)
             .agregarMonto(
-              new Decimal(this.importes.importeTotal)
-                .mul(obtenerValorPorcentaje(porcentajeDetraccion))
-                .toFixed(2)
-            )
+              new Decimal(this.importes.importeTotal).mul(obtenerValorPorcentaje(porcentajeDetraccion)).toFixed(2),
+            ),
         );
-        if (this._codigoDetraccion === "027") {
+        if (this._codigoDetraccion === '027') {
           this._detraccion?.agregarTransporte(
             DetraccionTransporte.crear()
               .agregarValorReferencial(this._valorReferencialDetraccion)
-              .agregarValorReferencialCargaEfectiva(
-                this._valorReferencialCargaEfectivaDetraccion
-              )
-              .agregarValorReferencialCargaUtil(
-                this._valorReferencialCargaUtilDetraccion
-              )
+              .agregarValorReferencialCargaEfectiva(this._valorReferencialCargaEfectivaDetraccion)
+              .agregarValorReferencialCargaUtil(this._valorReferencialCargaUtilDetraccion)
               .agregarUbigeoOrigen(this._ubigeoOrigenDetraccion)
               .agregarPuntoOrigen(this._puntoOrigenDetraccion)
               .agregarUbigeoDestino(this._ubigeoDestinoDetraccion)
               .agregarPuntoDestino(this._puntoDestinoDetraccion)
-              .agregarTramoViaje(this._tramoViajeDetraccion)
+              .agregarTramoViaje(this._tramoViajeDetraccion),
           );
         }
       }
@@ -1381,9 +1323,7 @@ export class Detalle {
   }
 
   private _codigoTipoAfectacionIgv?: string;
-  public agregarCodigoTipoAfectacionIgv(
-    codigoTipoAfectacionIgvOriginal: CodigoTipoAfectacionIgv
-  ): Detalle {
+  public agregarCodigoTipoAfectacionIgv(codigoTipoAfectacionIgvOriginal: CodigoTipoAfectacionIgv): Detalle {
     this._codigoTipoAfectacionIgv = codigoTipoAfectacionIgvOriginal;
     return this;
   }
@@ -1423,54 +1363,33 @@ export class Detalle {
     if (
       this._cantidad &&
       this._codigoTipoAfectacionIgv &&
-      ((EmiteApi.configuracion.calculoSegunValorUnitario &&
-        this._valorUnitario) ||
-        (!EmiteApi.configuracion.calculoSegunValorUnitario &&
-          this._precioVentaUnitario))
+      ((EmiteApi.configuracion.calculoSegunValorUnitario && this._valorUnitario) ||
+        (!EmiteApi.configuracion.calculoSegunValorUnitario && this._precioVentaUnitario))
     ) {
       this._codigoTipoAfectacionIgv;
       let totalDetalleIcbper = new Decimal(0.0);
 
       if (EmiteApi.configuracion.calculoSegunValorUnitario) {
-        this.agregarPrecioVentaUnitario(
-          obterMontoConIgv(this._valorUnitario!, this._codigoTipoAfectacionIgv)
-        );
+        this.agregarPrecioVentaUnitario(obterMontoConIgv(this._valorUnitario!, this._codigoTipoAfectacionIgv));
       } else {
-        this.agregarValorUnitario(
-          obtenerMontoSinIgv(
-            this._precioVentaUnitario!,
-            this._codigoTipoAfectacionIgv
-          )
-        );
+        this.agregarValorUnitario(obtenerMontoSinIgv(this._precioVentaUnitario!, this._codigoTipoAfectacionIgv));
       }
       this.agregarValorVenta(
-        new Decimal(this._cantidad)
-          .mul(this._valorUnitario!)
-          .toFixed(EmiteApi.configuracion.cantidadDecimales)
+        new Decimal(this._cantidad).mul(this._valorUnitario!).toFixed(EmiteApi.configuracion.cantidadDecimales),
       );
-      this.agregarImporteTotal(
-        obterMontoConIgv(this._valorVenta!, this._codigoTipoAfectacionIgv)
-      );
-      this.agregarIgv(
-        obtenerIgv(this._importeTotal!, this._codigoTipoAfectacionIgv)
-      );
+      this.agregarImporteTotal(obterMontoConIgv(this._valorVenta!, this._codigoTipoAfectacionIgv));
+      this.agregarIgv(obtenerIgv(this._importeTotal!, this._codigoTipoAfectacionIgv));
 
       if (this.icbp) {
         totalDetalleIcbper = totalDetalleIcbper.add(
-          new Decimal(EmiteApi.configuracion.valorIcbper!).mul(
-            new Decimal(this._cantidad)
-          )
+          new Decimal(EmiteApi.configuracion.valorIcbper!).mul(new Decimal(this._cantidad)),
         );
 
         this.agregarIcbper(
-          Icbper.crear()
-            .agregarMonto(EmiteApi.configuracion.valorIcbper!)
-            .agregarCantidad(this._cantidad!)
+          Icbper.crear().agregarMonto(EmiteApi.configuracion.valorIcbper!).agregarCantidad(this._cantidad!),
         );
 
-        this.agregarImporteTotal(
-          new Decimal(this._importeTotal!).add(totalDetalleIcbper).toFixed(2)
-        );
+        this.agregarImporteTotal(new Decimal(this._importeTotal!).add(totalDetalleIcbper).toFixed(2));
       }
       return this;
     } else {

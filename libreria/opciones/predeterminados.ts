@@ -1,4 +1,4 @@
-import { Opciones } from "./opciones";
+import { Opciones } from './opciones';
 
 export interface OpcionesPredeterminadas extends Opciones {
   urlApiPruebas?: string;
@@ -8,7 +8,7 @@ export interface OpcionesPredeterminadas extends Opciones {
 }
 
 const OpcionesPredeterminadas: OpcionesPredeterminadas = {
-  monedaPredeterminada: "PEN",
+  monedaPredeterminada: 'PEN',
   porcentajeIgv: 18.0,
   cantidadDecimales: 10,
   aumentaValorPorcentaje: false,
@@ -18,12 +18,12 @@ const OpcionesPredeterminadas: OpcionesPredeterminadas = {
   descuentoGlobalPorcentaje: false,
   calculoSegunValorUnitario: false,
   cambiaCantidadSegunPrecio: false,
-  valorIcbper: "0.50",
+  valorIcbper: '0.50',
   entornoPruebas: true,
-  urlApiPruebas: "https://api.uat.emite.pe",
-  urlApiProduccion: "https://api.emite.pe",
-  urlRegistrarFactura: "/factura/registrar",
-  urlRegistrarBoleta: "/bolñeta/registrar",
+  urlApiPruebas: 'https://api.uat.emite.pe',
+  urlApiProduccion: 'https://api.emite.pe',
+  urlRegistrarFactura: '/factura/registrar',
+  urlRegistrarBoleta: '/bolñeta/registrar',
 };
 
 export default OpcionesPredeterminadas;
