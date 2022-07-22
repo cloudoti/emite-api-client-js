@@ -1,0 +1,26 @@
+{
+  "name": "emite-api",
+  "version": "1.0.0",
+  "description": "calculo y generación de JSON para API Emite",
+  "main": "dist.emite-api.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "format": "prettier --write \"libreria/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "decimal.js": "^10.3.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.2.3"
+  }
+}
