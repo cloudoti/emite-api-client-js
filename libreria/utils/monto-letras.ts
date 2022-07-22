@@ -122,10 +122,10 @@ function miles(num: number) {
   const _cientos = Math.floor(num / _divisor);
   const _resto = num - _cientos * _divisor;
 
-  let strMiles = seccion(num, _divisor, 'UN MIL', 'MIL');
-  let strCentenas = centenas(_resto);
+  const strMiles = seccion(num, _divisor, 'UN MIL', 'MIL');
+  const strCentenas = centenas(_resto);
 
-  if (strMiles == '') return strCentenas;
+  if (strMiles === '') return strCentenas;
 
   return strMiles + ' ' + strCentenas;
 }
@@ -135,10 +135,10 @@ function millones(num: number) {
   const _cientos = Math.floor(num / _divisor);
   const _resto = num - _cientos * _divisor;
 
-  let strMillones = seccion(num, _divisor, 'UN MILLON DE', 'MILLONES DE');
-  let strMiles = miles(_resto);
+  const strMillones = seccion(num, _divisor, 'UN MILLON DE', 'MILLONES DE');
+  const strMiles = miles(_resto);
 
-  if (strMillones == '') return strMiles;
+  if (strMillones === '') return strMiles;
 
   return strMillones + ' ' + strMiles;
 }
@@ -149,7 +149,7 @@ export function numeroALetras(numString: string, tipoMoneda: string) {
   if (tipoMoneda === 'PEN') nombreMoneda = 'SOLES';
   if (tipoMoneda === 'USD') nombreMoneda = 'DÓLARES AMERICANOS';
   if (tipoMoneda === 'EUR') nombreMoneda = 'EUROS';
-  let data = {
+  const data = {
     numero: _num,
     enteros: Math.floor(_num),
     centavos: Math.round(_num * 100) - Math.floor(_num) * 100,
@@ -159,7 +159,7 @@ export function numeroALetras(numString: string, tipoMoneda: string) {
 
   data.letrasCentavos = 'CON ' + (data.centavos < 10 ? '0' : '') + data.centavos.toString() + '/100';
 
-  if (data.enteros == 0) return 'CERO' + ' ' + data.letrasCentavos + ' ' + data.letrasMoneda;
-  if (data.enteros == 1) return millones(data.enteros) + ' ' + data.letrasCentavos + ' ' + data.letrasMoneda;
+  if (data.enteros === 0) return 'CERO' + ' ' + data.letrasCentavos + ' ' + data.letrasMoneda;
+  if (data.enteros === 1) return millones(data.enteros) + ' ' + data.letrasCentavos + ' ' + data.letrasMoneda;
   else return millones(data.enteros) + ' ' + data.letrasCentavos + ' ' + data.letrasMoneda;
 }

@@ -8,7 +8,7 @@ export function obtenerValorPorcentaje(porcentaje: string): Decimal {
 
 export function obterMontoConIgv(montoSinIgv: string, afectacion: string): string {
   if (afectacion === '10') {
-    let valorIgv = new Decimal(1).add(EmiteApi.configuracion.valorIgv!);
+    const valorIgv = new Decimal(1).add(EmiteApi.configuracion.valorIgv!);
     return new Decimal(montoSinIgv).mul(valorIgv).toFixed(2);
   } else {
     return new Decimal(montoSinIgv).toFixed(2);
@@ -17,7 +17,7 @@ export function obterMontoConIgv(montoSinIgv: string, afectacion: string): strin
 
 export function obtenerMontoSinIgv(montoConIgv: string, afectacion: string): string {
   if (afectacion === '10') {
-    let valorIgv = new Decimal(1).add(EmiteApi.configuracion.valorIgv!);
+    const valorIgv = new Decimal(1).add(EmiteApi.configuracion.valorIgv!);
     return new Decimal(montoConIgv).div(valorIgv).toFixed(EmiteApi.configuracion.cantidadDecimales);
   } else {
     return new Decimal(montoConIgv).toFixed(EmiteApi.configuracion.cantidadDecimales);
@@ -77,7 +77,7 @@ export function obtenerIgv(montoConIgv: string, afectacion: string): Igv {
       .agregarMonto(new Decimal(montoConIgv).sub(new Decimal(obtenerMontoSinIgv(montoConIgv, afectacion))).toFixed(2))
       .agregarCodigoTipoAfectacionIgv(afectacion);
   } else if (afectacion !== '10' && afectacion !== '20' && afectacion !== '30' && afectacion !== '40') {
-    if (parseInt(afectacion) > 10 && parseInt(afectacion) < 20) {
+    if (Number(afectacion) > 10 && Number(afectacion) < 20) {
       return Igv.crear()
         .agregarMontoGratuito(
           new Decimal(montoConIgv).sub(new Decimal(obtenerMontoSinIgv(montoConIgv, afectacion))).toFixed(2),

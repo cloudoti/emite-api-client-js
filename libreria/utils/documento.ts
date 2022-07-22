@@ -1,5 +1,5 @@
-import { Decimal } from 'decimal.js';
-import { numeroALetras } from './monto-letras';
+import {Decimal} from 'decimal.js';
+import {numeroALetras} from './monto-letras';
 import EmiteApi from '../../emite-api';
 import {
   obtenerIgv,
@@ -8,7 +8,7 @@ import {
   obtenerValorPorcentaje,
   obterMontoConIgv,
 } from './funciones';
-import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
+import {CodigoDetraccion, CodigoTipoAfectacionIgv} from './types';
 
 export class Documento {
   private _cabecera?: Cabecera;
@@ -480,7 +480,7 @@ export class Huesped {
     return this;
   }
 
-  private _fechaArrivo?: string; //YYYY-MM-DD
+  private _fechaArrivo?: string; // YYYY-MM-DD
   public get fechaArrivo(): string | undefined {
     return this._fechaArrivo;
   }
@@ -489,7 +489,7 @@ export class Huesped {
     return this;
   }
 
-  private _fechaIngreso?: string; //YYYY-MM-DD
+  private _fechaIngreso?: string; // YYYY-MM-DD
   public get fechaIngreso(): string | undefined {
     return this._fechaIngreso;
   }
@@ -498,7 +498,7 @@ export class Huesped {
     return this;
   }
 
-  private _fechaSalida?: string; //YYYY-MM-DD
+  private _fechaSalida?: string; // YYYY-MM-DD
   public get fechaSalida(): string | undefined {
     return this._fechaSalida;
   }
@@ -507,7 +507,7 @@ export class Huesped {
     return this;
   }
 
-  private _fechaConsumo?: string; //YYYY-MM-DD
+  private _fechaConsumo?: string; // YYYY-MM-DD
   public get fechaConsumo(): string | undefined {
     return this._fechaConsumo;
   }
@@ -685,7 +685,7 @@ interface FormaPago {
 
 interface Cuotas {
   monto?: string;
-  fechaVencimiento?: string; //YYYY-MM-DD
+  fechaVencimiento?: string; // YYYY-MM-DD
 }
 
 interface Adicionales {
@@ -721,7 +721,7 @@ export class Cabecera {
     return this;
   }
 
-  private _fechaEmision?: string; //YYYY-MM-DD
+  private _fechaEmision?: string; // YYYY-MM-DD
   public get fechaEmision(): string | undefined {
     return this._fechaEmision;
   }
@@ -1080,8 +1080,8 @@ export class Cabecera {
           default:
             totalGratuito = totalGratuito.add(new Decimal(item.valorVenta!));
             if (
-              parseInt(item.igv?.codigoTipoAfectacionIgv!) > 10 &&
-              parseInt(item.igv?.codigoTipoAfectacionIgv!) < 20
+              Number(item.igv?.codigoTipoAfectacionIgv!) > 10 &&
+                Number(item.igv?.codigoTipoAfectacionIgv!) < 20
             ) {
               totalGratuitoGravado = totalGratuitoGravado.add(new Decimal(item.valorVenta!));
             }
@@ -1366,7 +1366,6 @@ export class Detalle {
       ((EmiteApi.configuracion.calculoSegunValorUnitario && this._valorUnitario) ||
         (!EmiteApi.configuracion.calculoSegunValorUnitario && this._precioVentaUnitario))
     ) {
-      this._codigoTipoAfectacionIgv;
       let totalDetalleIcbper = new Decimal(0.0);
 
       if (EmiteApi.configuracion.calculoSegunValorUnitario) {
