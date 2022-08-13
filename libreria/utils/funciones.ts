@@ -2,6 +2,12 @@ import { Decimal } from 'decimal.js';
 import { Igv } from './documento';
 import EmiteApi from '../../emite-api';
 
+export function validarNumero(numero?: string): string {
+  let numeroValido = new Decimal(0).valueOf();
+  if (numero && !isNaN(Number(numero))) numeroValido = new Decimal(numero).valueOf();
+  return numeroValido;
+}
+
 export function obtenerValorPorcentaje(porcentaje: string): Decimal {
   return new Decimal(porcentaje).div(new Decimal(100));
 }

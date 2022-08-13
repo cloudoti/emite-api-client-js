@@ -1,14 +1,16 @@
-import {Decimal} from 'decimal.js';
-import {numeroALetras} from './monto-letras';
+import { Decimal } from 'decimal.js';
+import { numeroALetras } from './monto-letras';
 import EmiteApi from '../../emite-api';
 import {
+  validarNumero,
   obtenerIgv,
   obtenerMontoSinIgv,
   obtenerPorcentajeDetraccion,
   obtenerValorPorcentaje,
   obterMontoConIgv,
 } from './funciones';
-import {CodigoDetraccion, CodigoTipoAfectacionIgv} from './types';
+import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
+import OpcionesPredeterminadas from '../opciones/predeterminados';
 
 export class Documento {
   private _cabecera?: Cabecera;
@@ -24,7 +26,6 @@ export class Documento {
   public get detalle(): Detalle[] {
     return this._detalle;
   }
-
   public agregarDetalle(detalle: Detalle): Documento {
     this._detalle.push(detalle);
     return this;
@@ -134,6 +135,15 @@ class Direccion {
 }
 
 export class Adquiriente {
+  private _id?: number;
+  public get id(): number | undefined {
+    return this._id;
+  }
+  public agregarId(id: number): Adquiriente {
+    this._id = id;
+    return this;
+  }
+
   private _numeroIdentidad?: string;
   public get numeroIdentidad(): string | undefined {
     return this._numeroIdentidad;
@@ -147,7 +157,7 @@ export class Adquiriente {
   public get tipoIdentidad(): string | undefined {
     return this._tipoIdentidad;
   }
-  public agregarTipoIdentidad(tipoIdentidad: string): Adquiriente {
+  public agregarTipoIdentidad(tipoIdentidad: '0' | '1' | '4' | '6' | '7' | 'A'): Adquiriente {
     this._tipoIdentidad = tipoIdentidad;
     return this;
   }
@@ -276,7 +286,7 @@ class DetraccionTransporte {
     return this._valorReferencial;
   }
   public agregarValorReferencial(valorReferencial?: string): DetraccionTransporte {
-    this._valorReferencial = new Decimal(valorReferencial ? valorReferencial : 0).toFixed(2);
+    this._valorReferencial = new Decimal(validarNumero(valorReferencial)).toFixed(2);
     return this;
   }
 
@@ -285,9 +295,7 @@ class DetraccionTransporte {
     return this._valorReferencialCargaEfectiva;
   }
   public agregarValorReferencialCargaEfectiva(valorReferencialCargaEfectiva?: string): DetraccionTransporte {
-    this._valorReferencialCargaEfectiva = new Decimal(
-      valorReferencialCargaEfectiva ? valorReferencialCargaEfectiva : 0,
-    ).toFixed(2);
+    this._valorReferencialCargaEfectiva = new Decimal(validarNumero(valorReferencialCargaEfectiva)).toFixed(2);
     return this;
   }
 
@@ -296,7 +304,7 @@ class DetraccionTransporte {
     return this._valorReferencialCargaUtil;
   }
   public agregarValorReferencialCargaUtil(valorReferencialCargaUtil?: string): DetraccionTransporte {
-    this._valorReferencialCargaUtil = new Decimal(valorReferencialCargaUtil ? valorReferencialCargaUtil : 0).toFixed(2);
+    this._valorReferencialCargaUtil = new Decimal(validarNumero(valorReferencialCargaUtil)).toFixed(2);
     return this;
   }
 
@@ -430,6 +438,37 @@ export class Detraccion {
       monto: this._monto,
       tipoMoneda: this._tipoMoneda,
       transporte: this.transporte,
+    };
+  }
+}
+
+export class RetencionIgv {
+  private _monto?: string;
+  public get monto(): string | undefined {
+    return this._monto;
+  }
+  public agregarMonto(monto?: string): RetencionIgv {
+    this._monto = monto;
+    return this;
+  }
+
+  private _porcentaje?: string;
+  public get porcentaje(): string | undefined {
+    return this._porcentaje;
+  }
+  public agregarPorcentaje(porcentaje?: string): RetencionIgv {
+    this._porcentaje = porcentaje;
+    return this;
+  }
+
+  public static crear(): RetencionIgv {
+    return new RetencionIgv();
+  }
+
+  public toJSON() {
+    return {
+      monto: this._monto,
+      porcentaje: this._porcentaje,
     };
   }
 }
@@ -622,6 +661,10 @@ class Importes {
     return this;
   }
 
+  public static crear(): Importes {
+    return new Importes();
+  }
+
   public toJSON() {
     return {
       totalDescuentoNAB: this._totalDescuentoNAB,
@@ -673,27 +716,146 @@ class OtrosTributos {
   monto?: string;
 }
 
-interface GuiasRemision {
-  numero?: string;
-  tipo?: string;
+export class GuiaRemision {
+  private _numero?: string;
+  public get numero(): string | undefined {
+    return this._numero;
+  }
+
+  public agregarNumero(numero: string): GuiaRemision {
+    this._numero = numero;
+    return this;
+  }
+
+  private _tipo?: string;
+  public get tipo(): string | undefined {
+    return this._tipo;
+  }
+
+  public agregarTipo(tipo: '09' | '31' | '71' | '72'): GuiaRemision {
+    this._tipo = tipo;
+    return this;
+  }
+
+  public static crear(): GuiaRemision {
+    return new GuiaRemision();
+  }
+
+  public toJSON() {
+    return {
+      numero: this._numero,
+      tipo: this._tipo,
+    };
+  }
 }
 
-interface FormaPago {
-  tipo?: string; // 1 - 2
-  monto?: string;
+class FormaPago {
+  private _tipo?: string;
+  public get tipo(): string | undefined {
+    return this._tipo;
+  }
+
+  public agregarTipo(tipo: '1' | '2'): FormaPago {
+    this._tipo = tipo;
+    return this;
+  }
+
+  private _monto?: string;
+  public get monto(): string | undefined {
+    return this._monto;
+  }
+
+  public agregarMonto(monto: string): FormaPago {
+    this._monto = monto;
+    return this;
+  }
+
+  public static crear(): FormaPago {
+    return new FormaPago();
+  }
+
+  public toJSON() {
+    return {
+      tipo: this._tipo,
+      monto: this._monto,
+    };
+  }
 }
 
-interface Cuotas {
-  monto?: string;
-  fechaVencimiento?: string; // YYYY-MM-DD
+export class Cuota {
+  private _monto?: string;
+  public get monto(): string | undefined {
+    return this._monto;
+  }
+
+  public agregarMonto(monto: string): Cuota {
+    this._monto = monto;
+    return this;
+  }
+
+  private _fechaVencimiento?: string; // YYYY-MM-DD
+  public get fechaVencimiento(): string | undefined {
+    return this._fechaVencimiento;
+  }
+
+  public agregarFechaVencimiento(fechaVencimiento: string): Cuota {
+    this._fechaVencimiento = fechaVencimiento;
+    return this;
+  }
+
+  public static crear(): Cuota {
+    return new Cuota();
+  }
+
+  public toJSON() {
+    return {
+      monto: this._monto,
+      fechaVencimiento: this._fechaVencimiento,
+    };
+  }
 }
 
-interface Adicionales {
-  codigo?: string;
-  valor?: string;
+class Adicional {
+  private _codigo?: string;
+  public get codigo(): string | undefined {
+    return this._codigo;
+  }
+  public agregarCodigo(codigo: string): Adicional {
+    this._codigo = codigo;
+    return this;
+  }
+
+  private _valor?: string;
+  public get valor(): string | undefined {
+    return this._valor;
+  }
+  public agregarValor(valor: string): Adicional {
+    this._valor = valor;
+    return this;
+  }
+
+  public static crear(): Adicional {
+    return new Adicional();
+  }
+
+  public toJSON() {
+    return {
+      codigo: this._codigo,
+      valor: this._valor,
+    };
+  }
 }
 
 export class Cabecera {
+  private _tipoDocumento?: string;
+  public get tipoDocumento(): string | undefined {
+    return this._tipoDocumento;
+  }
+  public agregarTipoDocumento(tipoDocumento: '01' | '03'): Cabecera {
+    this._tipoDocumento = tipoDocumento;
+    return this;
+  }
+
   private _codigoEstablecimiento?: string;
   public get codigoEstablecimiento(): string | undefined {
     return this._codigoEstablecimiento;
@@ -739,11 +901,12 @@ export class Cabecera {
     return this;
   }
 
-  private _fechaVencimiento?: string; // Opcional porque con las cuotas esto ya no vale
+  // todo Opcional porque con las cuotas esto ya no vale (se deja ŕivado para revision)
+  private _fechaVencimiento?: string;
   public get fechaVencimiento(): string | undefined {
     return this._fechaVencimiento;
   }
-  public agregarFechaVencimiento(fechaVencimiento: string): Cabecera {
+  private agregarFechaVencimiento(fechaVencimiento: string): Cabecera {
     this._fechaVencimiento = fechaVencimiento;
     return this;
   }
@@ -752,8 +915,28 @@ export class Cabecera {
   public get tipoMoneda(): string | undefined {
     return this._tipoMoneda;
   }
-  public agregarTipoMoneda(tipoMoneda: string): Cabecera {
+  private _simboloMoneda?: string;
+  public get simboloMoneda(): string | undefined {
+    return this._simboloMoneda;
+  }
+  public agregarTipoMoneda(tipoMoneda: 'PEN' | 'USD' | 'EUR'): Cabecera {
     this._tipoMoneda = tipoMoneda;
+    if (tipoMoneda === 'USD') {
+      this._simboloMoneda = '$';
+    } else if (tipoMoneda === 'EUR') {
+      this._simboloMoneda = '€';
+    } else {
+      this._simboloMoneda = 'S/';
+    }
+    return this;
+  }
+
+  private _tipoCambio?: string;
+  public get tipoCambio(): string | undefined {
+    return this._tipoCambio;
+  }
+  public agregarTipoCambio(tipoCambio: string): Cabecera {
+    this._tipoCambio = tipoCambio;
     return this;
   }
 
@@ -838,12 +1021,12 @@ export class Cabecera {
     return this;
   }
 
-  private _guiasRemision?: GuiasRemision[];
-  public get guiasRemision(): GuiasRemision[] | undefined {
+  private _guiasRemision: GuiaRemision[] = [];
+  public get guiasRemision(): GuiaRemision[] {
     return this._guiasRemision;
   }
-  public agregarGuiasRemision(guiasRemision: GuiasRemision): Cabecera {
-    this._guiasRemision?.push(guiasRemision);
+  public agregarGuiasRemision(guiaRemision: GuiaRemision): Cabecera {
+    this._guiasRemision.push(guiaRemision);
     return this;
   }
 
@@ -901,12 +1084,57 @@ export class Cabecera {
     return this;
   }
 
+  private _descuentoGlobal?: string;
+  public get descuentoGlobal(): string | undefined {
+    return this._descuentoGlobal;
+  }
+  private agregarDescuentoGlobal(descuentoGlobal: string): Cabecera {
+    this._descuentoGlobal = descuentoGlobal;
+    return this;
+  }
+
+  private _descuentoABaseImponible?: string;
+  public get descuentoABaseImponible(): string | undefined {
+    return this._descuentoABaseImponible;
+  }
+  public agregarDescuentoABaseImponible(descuentoABaseImponible: string): Cabecera {
+    this._descuentoABaseImponible = validarNumero(descuentoABaseImponible);
+    return this;
+  }
+
   private _descuentoGlobalNAB?: string;
   public get descuentoGlobalNAB(): string | undefined {
     return this._descuentoGlobalNAB;
   }
-  public agregarDescuentoGlobalNAB(descuentoGlobalNAB: string): Cabecera {
+  private agregarDescuentoGlobalNAB(descuentoGlobalNAB: string): Cabecera {
     this._descuentoGlobalNAB = descuentoGlobalNAB;
+    return this;
+  }
+
+  private _descuentoAImporteTotal?: string;
+  public get descuentoAImporteTotal(): string | undefined {
+    return this._descuentoAImporteTotal;
+  }
+  public agregarDescuentoAImporteTotal(descuentoAImporteTotal: string): Cabecera {
+    this._descuentoAImporteTotal = validarNumero(descuentoAImporteTotal);
+    return this;
+  }
+
+  private _cargoABaseImponible?: string;
+  public get cargoABaseImponible(): string | undefined {
+    return this._cargoABaseImponible;
+  }
+  public agregarCargoABaseImponible(cargoABaseImponible: string): Cabecera {
+    this._cargoABaseImponible = validarNumero(cargoABaseImponible);
+    return this;
+  }
+
+  private _cargoAImporteTotal?: string;
+  public get cargoAImporteTotal(): string | undefined {
+    return this._cargoAImporteTotal;
+  }
+  public agregarCargoAImporteTotal(cargoAImporteTotal: string): Cabecera {
+    this._cargoAImporteTotal = validarNumero(cargoAImporteTotal);
     return this;
   }
 
@@ -927,25 +1155,25 @@ export class Cabecera {
 
   private _porcentajeDetraccion?: string;
   public agregarPorcentajeDetraccion(porcentajeDetraccion?: string): Cabecera {
-    this._porcentajeDetraccion = porcentajeDetraccion;
+    this._porcentajeDetraccion = validarNumero(porcentajeDetraccion);
     return this;
   }
 
   private _valorReferencialDetraccion?: string;
   public agregarValorReferencialDetraccion(valorReferencialDetraccion?: string): Cabecera {
-    this._valorReferencialDetraccion = valorReferencialDetraccion;
+    this._valorReferencialDetraccion = validarNumero(valorReferencialDetraccion);
     return this;
   }
 
   private _valorReferencialCargaEfectivaDetraccion?: string;
   public agregarValorReferencialCargaEfectivaDetraccion(valorReferencialCargaEfectivaDetraccion?: string): Cabecera {
-    this._valorReferencialCargaEfectivaDetraccion = valorReferencialCargaEfectivaDetraccion;
+    this._valorReferencialCargaEfectivaDetraccion = validarNumero(valorReferencialCargaEfectivaDetraccion);
     return this;
   }
 
   private _valorReferencialCargaUtilDetraccion?: string;
   public agregarValorReferencialCargaUtilDetraccion(valorReferencialCargaUtilDetraccion?: string): Cabecera {
-    this._valorReferencialCargaUtilDetraccion = valorReferencialCargaUtilDetraccion;
+    this._valorReferencialCargaUtilDetraccion = validarNumero(valorReferencialCargaUtilDetraccion);
     return this;
   }
 
@@ -983,17 +1211,23 @@ export class Cabecera {
   public get formaPago(): FormaPago | undefined {
     return this._formaPago;
   }
-  public agregarFormaPago(formaPago: FormaPago): Cabecera {
+  private agregarFormaPago(formaPago: FormaPago): Cabecera {
     this._formaPago = formaPago;
     return this;
   }
 
-  private _cuotas?: Cuotas[];
-  public get cuotas(): Cuotas[] | undefined {
-    return this._cuotas;
+  private _tipoFormaPago?: string;
+  public agregarTipoFormaPago(tipoFormaPago: '1' | '2'): Cabecera {
+    this._tipoFormaPago = tipoFormaPago;
+    return this;
   }
-  public agregarCuotas(cuotas: Cuotas): Cabecera {
-    this._cuotas?.push(cuotas);
+
+  private _cuotasPago: Cuota[] = [];
+  public get cuotasPago(): Cuota[] {
+    return this._cuotasPago;
+  }
+  public agregarCuotasPago(cuota: Cuota): Cabecera {
+    this._cuotasPago.push(cuota);
     return this;
   }
 
@@ -1006,12 +1240,30 @@ export class Cabecera {
     return this;
   }
 
-  private _adicionales: Adicionales[] = [];
-  public get adicionales(): Adicionales[] {
+  private _adicionales: Adicional[] = [];
+  public get adicionales(): Adicional[] {
     return this._adicionales;
   }
-  public agregarAdicionales(adicionales: Adicionales): Cabecera {
-    this._adicionales?.push(adicionales);
+  public agregarAdicionales(adicional: Adicional): Cabecera {
+    this._adicionales?.push(adicional);
+    return this;
+  }
+
+  private _retencionesIgv?: RetencionIgv;
+  public get retencionesIgv(): RetencionIgv | undefined {
+    return this._retencionesIgv;
+  }
+  private agregarRetencionesIgv(retencionesIgv: RetencionIgv): Cabecera {
+    this._retencionesIgv = retencionesIgv;
+    return this;
+  }
+
+  private _retencionIgv?: boolean;
+  public get retencionIgv(): boolean | undefined {
+    return this._retencionIgv;
+  }
+  public agregarRetencionIgv(retencionIgv?: boolean): Cabecera {
+    this._retencionIgv = retencionIgv;
     return this;
   }
 
@@ -1039,6 +1291,10 @@ export class Cabecera {
       importes: this.importes,
       montoEnLetras: this._montoEnLetras,
       detraccion: this.detraccion,
+      retencionIgv: this.retencionesIgv,
+      formaPago: this.formaPago,
+      cuotas: this._cuotasPago.length > 0 ? this.cuotasPago : undefined,
+      guiasRemision: this._guiasRemision.length > 0 ? this.guiasRemision : undefined,
       adicionales: this._adicionales.length > 0 ? this.adicionales : undefined,
     };
   }
@@ -1052,6 +1308,12 @@ export class Cabecera {
     let totalExportacion = new Decimal(0.0);
     let totalIcbper = new Decimal(0.0);
     let totalCantidadIcbper = new Decimal(0);
+
+    const totalAnticipoGravado = new Decimal(0.0);
+    const totalAnticipoExonerado = new Decimal(0.0);
+    const totalAnticipoInafecto = new Decimal(0.0);
+
+    this.agregarImportes(Importes.crear());
 
     detalle?.forEach((item: Detalle) => {
       if (item.cantidad && item.valorUnitario && item.precioVentaUnitario && item.igv) {
@@ -1079,15 +1341,44 @@ export class Cabecera {
             break;
           default:
             totalGratuito = totalGratuito.add(new Decimal(item.valorVenta!));
-            if (
-              Number(item.igv?.codigoTipoAfectacionIgv!) > 10 &&
-                Number(item.igv?.codigoTipoAfectacionIgv!) < 20
-            ) {
+            if (Number(item.igv?.codigoTipoAfectacionIgv!) > 10 && Number(item.igv?.codigoTipoAfectacionIgv!) < 20) {
               totalGratuitoGravado = totalGratuitoGravado.add(new Decimal(item.valorVenta!));
             }
         }
       }
     });
+
+    let descuentoABaseImponible = new Decimal(0.0);
+    if (this._descuentoABaseImponible) {
+      if (EmiteApi.configuracion.descuentoGlobalPorcentaje) {
+        descuentoABaseImponible = totalGravado.mul(obtenerValorPorcentaje(this._descuentoABaseImponible));
+      } else {
+        if (EmiteApi.configuracion.calculaDescuentoGlobalSinIgv) {
+          descuentoABaseImponible = new Decimal(this._descuentoABaseImponible);
+        } else {
+          descuentoABaseImponible = new Decimal(obtenerMontoSinIgv(this._descuentoABaseImponible, '10'));
+        }
+      }
+      this.agregarDescuentoGlobal(descuentoABaseImponible.toFixed(2));
+    }
+
+    let cargoABaseImponible = new Decimal(0.0);
+    if (this._cargoABaseImponible) {
+      if (EmiteApi.configuracion.cargoGlobalPorcentaje) {
+        cargoABaseImponible = totalGravado.mul(obtenerValorPorcentaje(this._cargoABaseImponible));
+      } else {
+        if (EmiteApi.configuracion.calculaCargoGlobalSinIgv) {
+          cargoABaseImponible = new Decimal(this._cargoABaseImponible);
+        } else {
+          cargoABaseImponible = new Decimal(obtenerMontoSinIgv(this._cargoABaseImponible, '10'));
+        }
+      }
+      this.importes?.agregarOtrosCargos(cargoABaseImponible.toFixed(2));
+    }
+
+    totalGravado = totalGravado.sub(totalAnticipoGravado).sub(descuentoABaseImponible).add(cargoABaseImponible);
+    totalExonerado = totalExonerado.sub(totalAnticipoExonerado);
+    totalInafecto = totalInafecto.sub(totalAnticipoInafecto);
 
     this.agregarOperacionGravada(totalGravado.toFixed(2));
     this.agregarOperacionExonerada(totalExonerado.toFixed(2));
@@ -1107,16 +1398,39 @@ export class Cabecera {
       );
     }
 
-    const importeTotal = totalGravado
+    let total = totalGravado
       .add(totalExonerado)
       .add(totalInafecto)
       .add(totalExportacion)
       .add(new Decimal(this.igv?.monto!))
-      .add(totalIcbper)
-      .toFixed(2);
-    this.agregarImportes(new Importes().agregarImporteTotal(importeTotal));
-    this.agregarMontoEnLetras(numeroALetras(importeTotal, this.tipoMoneda!));
+      .add(totalIcbper);
 
+    let descuentoAImporteTotal = new Decimal(0.0);
+    if (this._descuentoAImporteTotal) {
+      if (EmiteApi.configuracion.descuentoGlobalPorcentaje) {
+        descuentoAImporteTotal = total.mul(obtenerValorPorcentaje(this._descuentoAImporteTotal));
+      } else {
+        descuentoAImporteTotal = new Decimal(this._descuentoAImporteTotal);
+      }
+      this.agregarDescuentoGlobalNAB(descuentoAImporteTotal.toFixed(2));
+      this.importes?.agregarTotalDescuentoNAB(this.descuentoGlobalNAB);
+    }
+
+    let cargoAImporteTotal = new Decimal(0.0);
+    if (this._cargoAImporteTotal) {
+      if (EmiteApi.configuracion.cargoGlobalPorcentaje) {
+        cargoAImporteTotal = total.mul(obtenerValorPorcentaje(this._cargoAImporteTotal));
+      } else {
+        cargoAImporteTotal = new Decimal(this._cargoAImporteTotal);
+      }
+      this.importes?.agregarCargoGlobalNAB(cargoAImporteTotal.toFixed(2));
+    }
+
+    total = total.sub(descuentoAImporteTotal).add(cargoAImporteTotal);
+    this.importes?.agregarImporteTotal(total.toFixed(2));
+    this.agregarMontoEnLetras(numeroALetras(this.importes?.importeTotal!, this.tipoMoneda!));
+
+    let montoDetraccion = new Decimal(0.0);
     if (
       this._codigoDetraccion &&
       EmiteApi.configuracion.cuentaDetracciones &&
@@ -1130,15 +1444,14 @@ export class Cabecera {
         porcentajeDetraccion = obtenerPorcentajeDetraccion(this._codigoDetraccion!);
       }
       if (porcentajeDetraccion) {
+        montoDetraccion = total.mul(obtenerValorPorcentaje(porcentajeDetraccion));
         this.agregarDetraccion(
           Detraccion.crear()
             .agregarCodigo(this._codigoDetraccion)
             .agregarPorcentaje(porcentajeDetraccion)
             .agregarCuenta(EmiteApi.configuracion.cuentaDetracciones)
             .agregarTipoMoneda(this._tipoMoneda)
-            .agregarMonto(
-              new Decimal(this.importes.importeTotal).mul(obtenerValorPorcentaje(porcentajeDetraccion)).toFixed(2),
-            ),
+            .agregarMonto(montoDetraccion.toFixed(2)),
         );
         if (this._codigoDetraccion === '027') {
           this._detraccion?.agregarTransporte(
@@ -1152,8 +1465,44 @@ export class Cabecera {
               .agregarPuntoDestino(this._puntoDestinoDetraccion)
               .agregarTramoViaje(this._tramoViajeDetraccion),
           );
+          if (this._valorReferencialDetraccion && new Decimal(this._valorReferencialDetraccion).greaterThan(total)) {
+            montoDetraccion = new Decimal(this._valorReferencialDetraccion).mul(
+              obtenerValorPorcentaje(porcentajeDetraccion),
+            );
+            this._detraccion?.agregarMonto(montoDetraccion.toFixed(2));
+          }
         }
       }
+    }
+
+    let montoRetencionIgv = new Decimal(0.0);
+    if (this.retencionIgv && this.importes?.importeTotal) {
+      montoRetencionIgv = total.mul(EmiteApi.configuracion.valorRetencionIgv!);
+      this.agregarRetencionesIgv(
+        RetencionIgv.crear()
+          .agregarPorcentaje(EmiteApi.configuracion.porcentajeRetencionIgv!.toString())
+          .agregarMonto(montoRetencionIgv.toFixed(2)),
+      );
+    }
+
+    this.agregarFormaPago(FormaPago.crear().agregarTipo('1'));
+    if (this._tipoFormaPago === '2') {
+      this.formaPago
+        ?.agregarTipo(this._tipoFormaPago)
+        .agregarMonto(total.sub(montoDetraccion).sub(montoRetencionIgv).toFixed(2));
+    }
+    if (this.formaPago?.tipo === '1') {
+      this.agregarAdicionales(
+        Adicional.crear()
+          .agregarCodigo(EmiteApi.configuracion.adicionalCodigoFormaPago)
+          .agregarValor(EmiteApi.configuracion.adicionalValorFormaPagoContado),
+      );
+    } else {
+      this.agregarAdicionales(
+        Adicional.crear()
+          .agregarCodigo(EmiteApi.configuracion.adicionalCodigoFormaPago)
+          .agregarValor(EmiteApi.configuracion.adicionalValorFormaPagoCredito),
+      );
     }
 
     return this;
@@ -1170,16 +1519,23 @@ export class Detalle {
     return this;
   }
 
+  private _id?: number;
+  public get id(): number | undefined {
+    return this._id;
+  }
+  public agregarId(id?: number): Detalle {
+    this._id = id;
+    return this;
+  }
+
   private _descripcion?: string;
   public get descripcion(): string | undefined {
     return this._descripcion;
   }
-
   private _multiDescripcion: string[] = [];
   public get multiDescripcion(): string[] {
     return this._multiDescripcion;
   }
-
   public agregarDescripcion(descripcion: string): Detalle {
     if (!this._descripcion) {
       this._descripcion = descripcion;
@@ -1193,7 +1549,6 @@ export class Detalle {
   public get codigoProducto(): string | undefined {
     return this._codigoProducto;
   }
-
   public agregarCodigoProducto(codigoProducto?: string): Detalle {
     this._codigoProducto = codigoProducto;
     return this;
@@ -1203,7 +1558,6 @@ export class Detalle {
   public get unidadMedida(): string | undefined {
     return this._unidadMedida;
   }
-
   public agregarUnidadMedida(unidadMedida: string): Detalle {
     this._unidadMedida = unidadMedida;
     return this;
@@ -1213,9 +1567,8 @@ export class Detalle {
   public get cantidad(): string | undefined {
     return this._cantidad;
   }
-
   public agregarCantidad(cantidad: string): Detalle {
-    this._cantidad = cantidad;
+    this._cantidad = validarNumero(cantidad);
     return this;
   }
 
@@ -1223,7 +1576,6 @@ export class Detalle {
   public get igv(): Igv | undefined {
     return this._igv;
   }
-
   private agregarIgv(igv: Igv): Detalle {
     this._igv = igv;
     return this;
@@ -1233,7 +1585,6 @@ export class Detalle {
   public get isc(): Isc | undefined {
     return this._isc;
   }
-
   private agregarIsc(isc: Isc): Detalle {
     this._isc = isc;
     return this;
@@ -1243,9 +1594,8 @@ export class Detalle {
   public get valorUnitario(): string | undefined {
     return this._valorUnitario;
   }
-
   public agregarValorUnitario(valorUnitario?: string): Detalle {
-    this._valorUnitario = valorUnitario;
+    this._valorUnitario = validarNumero(valorUnitario);
     return this;
   }
 
@@ -1253,7 +1603,6 @@ export class Detalle {
   public get importeTotal(): string | undefined {
     return this._importeTotal;
   }
-
   private agregarImporteTotal(importeTotal: string): Detalle {
     this._importeTotal = importeTotal;
     return this;
@@ -1263,7 +1612,6 @@ export class Detalle {
   public get valorVenta(): string | undefined {
     return this._valorVenta;
   }
-
   private agregarValorVenta(valorVenta: string): Detalle {
     this._valorVenta = valorVenta;
     return this;
@@ -1273,9 +1621,17 @@ export class Detalle {
   public get montoDescuento(): string | undefined {
     return this._montoDescuento;
   }
-
-  public agregarMontoDescuento(montoDescuento: string): Detalle {
+  private agregarMontoDescuento(montoDescuento: string): Detalle {
     this._montoDescuento = montoDescuento;
+    return this;
+  }
+
+  private _descuento?: string;
+  public get descuento(): string | undefined {
+    return this._descuento;
+  }
+  public agregarDescuento(descuento: string): Detalle {
+    this._descuento = validarNumero(descuento);
     return this;
   }
 
@@ -1283,9 +1639,8 @@ export class Detalle {
   public get precioVentaUnitario(): string | undefined {
     return this._precioVentaUnitario;
   }
-
   public agregarPrecioVentaUnitario(precioVentaUnitario?: string): Detalle {
-    this._precioVentaUnitario = precioVentaUnitario;
+    this._precioVentaUnitario = validarNumero(precioVentaUnitario);
     return this;
   }
 
@@ -1293,7 +1648,6 @@ export class Detalle {
   public get codigoSunat(): string | undefined {
     return this._codigoSunat;
   }
-
   public agregarCodigoSunat(codigoSunat: string): Detalle {
     this._codigoSunat = codigoSunat;
     return this;
@@ -1303,22 +1657,17 @@ export class Detalle {
   public get icbper(): Icbper | undefined {
     return this._icbper;
   }
-
   private agregarIcbper(icbper: Icbper): Detalle {
     this._icbper = icbper;
     return this;
   }
 
-  private _adicionales: Adicionales[] = [];
-  public get adicionales(): Adicionales[] {
+  private _adicionales: Adicional[] = [];
+  public get adicionales(): Adicional[] {
     return this._adicionales;
   }
-
-  public agregarAdicionales(adicionales: Adicionales): Detalle {
-    if (!this._adicionales) {
-      this._adicionales = [];
-    }
-    this._adicionales.push(adicionales);
+  public agregarAdicionales(adicional: Adicional): Detalle {
+    this._adicionales.push(adicional);
     return this;
   }
 
@@ -1332,7 +1681,6 @@ export class Detalle {
   public get icbp(): boolean | undefined {
     return this._icbp;
   }
-
   public agregarIcbp(icbp?: boolean): Detalle {
     this._icbp = icbp;
     return this;
@@ -1351,6 +1699,7 @@ export class Detalle {
       multiDescripcion: this.multiDescripcion,
       valorUnitario: this.valorUnitario,
       valorVenta: this.valorVenta,
+      montoDescuento: this.montoDescuento,
       importeTotal: this.importeTotal,
       igv: this.igv,
       icbper: this.icbper,
@@ -1369,13 +1718,43 @@ export class Detalle {
       let totalDetalleIcbper = new Decimal(0.0);
 
       if (EmiteApi.configuracion.calculoSegunValorUnitario) {
+        this.agregarValorUnitario(new Decimal(this._valorUnitario!).toFixed(EmiteApi.configuracion.cantidadDecimales));
         this.agregarPrecioVentaUnitario(obterMontoConIgv(this._valorUnitario!, this._codigoTipoAfectacionIgv));
       } else {
+        this.agregarPrecioVentaUnitario(new Decimal(this._precioVentaUnitario!).toFixed(2));
         this.agregarValorUnitario(obtenerMontoSinIgv(this._precioVentaUnitario!, this._codigoTipoAfectacionIgv));
       }
+
+      let descuentoABI = new Decimal(0.0);
+      if (this._descuento && this._codigoTipoAfectacionIgv === '10') {
+        if (EmiteApi.configuracion.descuentoUnitarioPorcentaje) {
+          descuentoABI = new Decimal(this._cantidad)
+            .mul(this._valorUnitario!)
+            .mul(obtenerValorPorcentaje(this._descuento));
+          this.agregarMontoDescuento(descuentoABI.toFixed(EmiteApi.configuracion.cantidadDecimales));
+        } else {
+          if (EmiteApi.configuracion.calculoSegunValorUnitario) {
+            descuentoABI = new Decimal(this._descuento);
+            this.agregarMontoDescuento(descuentoABI.toFixed(EmiteApi.configuracion.cantidadDecimales));
+          } else {
+            descuentoABI = new Decimal(obtenerMontoSinIgv(this._descuento, this._codigoTipoAfectacionIgv));
+            this.agregarMontoDescuento(descuentoABI.toFixed(EmiteApi.configuracion.cantidadDecimales));
+          }
+        }
+        this.agregarAdicionales(
+          Adicional.crear()
+            .agregarCodigo(OpcionesPredeterminadas.adicionalCodigoDescuentoUnitario)
+            .agregarValor(this._descuento),
+        );
+      }
+
       this.agregarValorVenta(
-        new Decimal(this._cantidad).mul(this._valorUnitario!).toFixed(EmiteApi.configuracion.cantidadDecimales),
+        new Decimal(this._cantidad)
+          .mul(this._valorUnitario!)
+          .sub(descuentoABI)
+          .toFixed(EmiteApi.configuracion.cantidadDecimales),
       );
+
       this.agregarImporteTotal(obterMontoConIgv(this._valorVenta!, this._codigoTipoAfectacionIgv));
       this.agregarIgv(obtenerIgv(this._importeTotal!, this._codigoTipoAfectacionIgv));
 
@@ -1390,9 +1769,8 @@ export class Detalle {
 
         this.agregarImporteTotal(new Decimal(this._importeTotal!).add(totalDetalleIcbper).toFixed(2));
       }
-      return this;
-    } else {
-      return new Detalle();
     }
+
+    return this;
   }
 }

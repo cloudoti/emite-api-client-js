@@ -1,8 +1,8 @@
-import { Opciones } from "./libreria/opciones/opciones";
+import { Opciones } from './libreria/opciones/opciones';
 import {
   Configuracion,
   obtenerConfiguracion,
-} from "./libreria/utils/configuracion";
+} from './libreria/utils/configuracion';
 
 class EmiteAPI {
   public configuracion: Configuracion;
