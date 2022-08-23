@@ -12,7 +12,7 @@ import {
 import { Generar } from './generar';
 import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
 import OpcionesPredeterminadas from '../opciones/predeterminados';
-import {UnprocessableEntityException} from '@nestjs/common';
+import { UnprocessableEntityException } from '@nestjs/common';
 
 export class Documento {
   private _cabecera?: Cabecera;
@@ -66,34 +66,40 @@ export class Documento {
     if (!this.cabecera?.adquiriente?.numeroIdentidad) {
       errores.push('Debe agregar el número de documento del cliente');
     }
-    if (this.cabecera?.tipoDocumento === '03' &&
-        this.cabecera?.adquiriente?.tipoIdentidad === '6') {
+    if (this.cabecera?.tipoDocumento === '03' && this.cabecera?.adquiriente?.tipoIdentidad === '6') {
       errores.push('El tipo de documento RUC es solo para facturas');
     }
-    if (this.cabecera?.tipoDocumento === '01' &&
-        this.cabecera?.adquiriente?.tipoIdentidad !== '6') {
+    if (this.cabecera?.tipoDocumento === '01' && this.cabecera?.adquiriente?.tipoIdentidad !== '6') {
       errores.push('Las facturas deben estar dirigidas a un RUC');
     }
     if (this.detalle.length === 0) {
       errores.push('Debe tener al menos un producto agregado a la venta');
     }
     this.detalle.forEach((item: Detalle, index: number) => {
-      if (item.igv?.codigoTipoAfectacionIgv !== '10' &&
-          item.igv?.codigoTipoAfectacionIgv !== '20' &&
-          item.igv?.codigoTipoAfectacionIgv !== '30' &&
-          item.igv?.codigoTipoAfectacionIgv !== '40' &&
-          new Decimal(item.importeTotal ?? '0').lessThan(new Decimal(0))) {
+      if (
+        item.igv?.codigoTipoAfectacionIgv !== '10' &&
+        item.igv?.codigoTipoAfectacionIgv !== '20' &&
+        item.igv?.codigoTipoAfectacionIgv !== '30' &&
+        item.igv?.codigoTipoAfectacionIgv !== '40' &&
+        new Decimal(item.importeTotal ?? '0').lessThan(new Decimal(0))
+      ) {
         errores.push('Producto #' + (index + 1) + ', No puede costar 0.00');
       }
     });
-    if (new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(new Decimal(0)) &&
-        new Decimal(this.cabecera?.operacionGratuita ?? '0').lessThan(new Decimal(0)) &&
-        new Decimal(this.cabecera?.igv?.montoGratuito ?? '0').lessThan(new Decimal(0))) {
+    if (
+      new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(new Decimal(0)) &&
+      new Decimal(this.cabecera?.operacionGratuita ?? '0').lessThan(new Decimal(0)) &&
+      new Decimal(this.cabecera?.igv?.montoGratuito ?? '0').lessThan(new Decimal(0))
+    ) {
       errores.push('La venta no puede ser menor o igual a 0.00');
     }
-    if (this.cabecera?.tipoDocumento === '03' &&
-        this.cabecera?.adquiriente?.tipoIdentidad === '0' &&
-        new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(new Decimal(EmiteApi.configuracion.montoMinimoBoleta!))) {
+    if (
+      this.cabecera?.tipoDocumento === '03' &&
+      this.cabecera?.adquiriente?.tipoIdentidad === '0' &&
+      new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(
+        new Decimal(EmiteApi.configuracion.montoMinimoBoleta!),
+      )
+    ) {
       errores.push('Boletas de 700 S/ o mas no puede ir a Público General');
     }
     return errores;
@@ -128,7 +134,6 @@ export class Documento {
     }
     return servicio.generar(this, path!);
   }
-
 }
 
 class Direccion {
