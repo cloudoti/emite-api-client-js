@@ -215,6 +215,15 @@ class Direccion {
 }
 
 export class Adquiriente {
+  private _id?: string;
+  public get id(): string | undefined {
+    return this._id;
+  }
+  public agregarId(id: string): Adquiriente {
+    this._id = id;
+    return this;
+  }
+
   private _numeroIdentidad?: string;
   public get numeroIdentidad(): string | undefined {
     return this._numeroIdentidad;
