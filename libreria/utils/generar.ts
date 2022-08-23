@@ -1,4 +1,4 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import EmiteApi from '../../emite-api';
 import { Documento } from './documento';
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 
 @Injectable()
 export class Generar {
-  async generar(documento: Documento, path: string): Promise<string> {
+  async generar(documento: Documento, path: string): Promise<{ codigo: number; respuesta: string }> {
     const configuracion = {
       baseURL: EmiteApi.configuracion.urlApi,
       headers: {
@@ -28,12 +28,10 @@ export class Generar {
     return axiosInstance
       .post(path, parametros, configuracion)
       .then((response: { data: any }) => {
-        return JSON.stringify(response.data);
+        return { codigo: 200, respuesta: JSON.stringify(response.data) };
       })
       .catch((error: { response: { data: { error: any } } }) => {
-        throw new UnprocessableEntityException({
-          error: [error.response.data.error],
-        });
+        return { codigo: 400, respuesta: JSON.stringify(error.response.data.error) };
       });
   }
 }

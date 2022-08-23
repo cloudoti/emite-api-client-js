@@ -1,6 +1,6 @@
 {
   "name": "emite-api-client-js",
-  "version": "0.0.6",
+  "version": "0.0.5",
   "description": "calculo y consumo de la API Emite",
   "main": "dist/emite-api.js",
   "files": [
@@ -16,7 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "decimal.js": "^10.3.1",
-    "@nestjs/common": "^7.6.15"
+    "@nestjs/common": "^7.6.15",
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "prettier": "^2.2.1",

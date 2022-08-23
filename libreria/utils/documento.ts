@@ -12,7 +12,6 @@ import {
 import { Generar } from './generar';
 import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
 import OpcionesPredeterminadas from '../opciones/predeterminados';
-import { UnprocessableEntityException } from '@nestjs/common';
 
 export class Documento {
   private _cabecera?: Cabecera;
@@ -116,16 +115,14 @@ export class Documento {
     };
   }
 
-  public async generar(): Promise<string> {
+  public async generar(): Promise<{ codigo: number; respuesta: string }> {
     const errores: string[] = [];
     if (!EmiteApi.configuracion.emiteKey) {
       errores.push('No tiene configurado el EMITE_KEY');
     }
     errores.push(...this.validar());
     if (errores.length > 0) {
-      throw new UnprocessableEntityException({
-        error: errores,
-      });
+      return { codigo: 400, respuesta: JSON.stringify(errores) };
     }
     const servicio = new Generar();
     let path = EmiteApi.configuracion.urlRegistrarFactura;
