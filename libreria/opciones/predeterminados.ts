@@ -22,6 +22,7 @@ const OpcionesPredeterminadas: OpcionesPredeterminadas = {
   calculaCargoGlobalSinIgv: false,
   cambiaCantidadSegunPrecio: false,
   valorIcbper: '0.50',
+  montoMinimoBoleta: '700.00',
   entornoPruebas: true,
   urlApiPruebas: 'https://api.uat.emite.pe',
   urlApiProduccion: 'https://api.emite.pe',

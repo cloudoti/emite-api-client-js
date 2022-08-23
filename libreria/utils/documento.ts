@@ -9,8 +9,10 @@ import {
   obtenerValorPorcentaje,
   obterMontoConIgv,
 } from './funciones';
+import { Generar } from './generar';
 import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
 import OpcionesPredeterminadas from '../opciones/predeterminados';
+import {UnprocessableEntityException} from '@nestjs/common';
 
 export class Documento {
   private _cabecera?: Cabecera;
@@ -41,6 +43,62 @@ export class Documento {
     return this;
   }
 
+  public validar(): string[] {
+    const errores: string[] = [];
+    if (!this.cabecera?.tipoOperacion) {
+      errores.push('Debe agregar el tipo de operación');
+    }
+    if (!this.cabecera?.tipoDocumento) {
+      errores.push('Debe agregar el tipo de documento a generar');
+    }
+    if (!this.cabecera?.tipoMoneda) {
+      errores.push('Debe agregar el tipo de moneda');
+    }
+    if (this.cabecera?.tipoMoneda === 'PEN' && !this.cabecera?.tipoCambio) {
+      errores.push('Debe agregar el tipo de cambio');
+    }
+    if (!this.cabecera?.adquiriente) {
+      errores.push('Debe agregar un cliente a la venta');
+    }
+    if (!this.cabecera?.adquiriente?.tipoIdentidad) {
+      errores.push('Debe agregar el tipo de documento del cliente');
+    }
+    if (!this.cabecera?.adquiriente?.numeroIdentidad) {
+      errores.push('Debe agregar el número de documento del cliente');
+    }
+    if (this.cabecera?.tipoDocumento === '03' &&
+        this.cabecera?.adquiriente?.tipoIdentidad === '6') {
+      errores.push('El tipo de documento RUC es solo para facturas');
+    }
+    if (this.cabecera?.tipoDocumento === '01' &&
+        this.cabecera?.adquiriente?.tipoIdentidad !== '6') {
+      errores.push('Las facturas deben estar dirigidas a un RUC');
+    }
+    if (this.detalle.length === 0) {
+      errores.push('Debe tener al menos un producto agregado a la venta');
+    }
+    this.detalle.forEach((item: Detalle, index: number) => {
+      if (item.igv?.codigoTipoAfectacionIgv !== '10' &&
+          item.igv?.codigoTipoAfectacionIgv !== '20' &&
+          item.igv?.codigoTipoAfectacionIgv !== '30' &&
+          item.igv?.codigoTipoAfectacionIgv !== '40' &&
+          new Decimal(item.importeTotal ?? '0').lessThan(new Decimal(0))) {
+        errores.push('Producto #' + (index + 1) + ', No puede costar 0.00');
+      }
+    });
+    if (new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(new Decimal(0)) &&
+        new Decimal(this.cabecera?.operacionGratuita ?? '0').lessThan(new Decimal(0)) &&
+        new Decimal(this.cabecera?.igv?.montoGratuito ?? '0').lessThan(new Decimal(0))) {
+      errores.push('La venta no puede ser menor o igual a 0.00');
+    }
+    if (this.cabecera?.tipoDocumento === '03' &&
+        this.cabecera?.adquiriente?.tipoIdentidad === '0' &&
+        new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(new Decimal(EmiteApi.configuracion.montoMinimoBoleta!))) {
+      errores.push('Boletas de 700 S/ o mas no puede ir a Público General');
+    }
+    return errores;
+  }
+
   public static crear(): Documento {
     return new Documento();
   }
@@ -51,6 +109,26 @@ export class Documento {
       detalle: this.detalle,
     };
   }
+
+  public async generar(): Promise<string> {
+    const errores: string[] = [];
+    if (!EmiteApi.configuracion.emiteKey) {
+      errores.push('No tiene configurado el EMITE_KEY');
+    }
+    errores.push(...this.validar());
+    if (errores.length > 0) {
+      throw new UnprocessableEntityException({
+        error: errores,
+      });
+    }
+    const servicio = new Generar();
+    let path = EmiteApi.configuracion.urlRegistrarFactura;
+    if (this.cabecera?.tipoDocumento === '03') {
+      path = EmiteApi.configuracion.urlRegistrarBoleta;
+    }
+    return servicio.generar(this, path!);
+  }
+
 }
 
 class Direccion {
@@ -135,15 +213,6 @@ class Direccion {
 }
 
 export class Adquiriente {
-  private _id?: number;
-  public get id(): number | undefined {
-    return this._id;
-  }
-  public agregarId(id: number): Adquiriente {
-    this._id = id;
-    return this;
-  }
-
   private _numeroIdentidad?: string;
   public get numeroIdentidad(): string | undefined {
     return this._numeroIdentidad;

@@ -16,6 +16,7 @@ export interface Configuracion extends Opciones {
 
 export function obtenerConfiguracion(opciones: Opciones): Configuracion {
   const configuracion: Configuracion = {
+    emiteKey: opciones.emiteKey,
     monedaPredeterminada: opciones.monedaPredeterminada || OpcionesPredeterminadas.monedaPredeterminada,
     porcentajeIgv: opciones.porcentajeIgv || OpcionesPredeterminadas.porcentajeIgv,
     porcentajeRetencionIgv: opciones.porcentajeRetencionIgv || OpcionesPredeterminadas.porcentajeRetencionIgv,
@@ -35,6 +36,7 @@ export function obtenerConfiguracion(opciones: Opciones): Configuracion {
     cambiaCantidadSegunPrecio: opciones.cambiaCantidadSegunPrecio || OpcionesPredeterminadas.cambiaCantidadSegunPrecio,
     cuentaDetracciones: opciones.cuentaDetracciones,
     valorIcbper: opciones.valorIcbper || OpcionesPredeterminadas.valorIcbper,
+    montoMinimoBoleta: opciones.montoMinimoBoleta || OpcionesPredeterminadas.montoMinimoBoleta,
     entornoPruebas: opciones.entornoPruebas || OpcionesPredeterminadas.entornoPruebas,
     urlRegistrarFactura: OpcionesPredeterminadas.urlRegistrarFactura,
     urlRegistrarBoleta: OpcionesPredeterminadas.urlRegistrarBoleta,

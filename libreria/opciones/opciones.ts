@@ -1,4 +1,5 @@
 export interface Opciones {
+  emiteKey?: string;
   monedaPredeterminada?: 'PEN' | 'USD' | 'EUR';
   porcentajeIgv?: number;
   porcentajeRetencionIgv?: number;
@@ -15,5 +16,6 @@ export interface Opciones {
   cambiaCantidadSegunPrecio?: boolean;
   cuentaDetracciones?: string;
   valorIcbper?: string;
+  montoMinimoBoleta?: string;
   entornoPruebas?: boolean;
 }
