@@ -128,6 +128,22 @@ export class Documento {
     let path = EmiteApi.configuracion.urlRegistrarFactura;
     if (this.cabecera?.tipoDocumento === '03') {
       path = EmiteApi.configuracion.urlRegistrarBoleta;
+      this.cabecera?.adquiriente?.direccion
+        ?.agregarDescripcion(
+          this.cabecera?.adquiriente?.direccion?.descripcion +
+            (this.cabecera?.adquiriente?.direccion?.distrito
+              ? ' ' + this.cabecera?.adquiriente?.direccion?.distrito
+              : '') +
+            (this.cabecera?.adquiriente?.direccion?.provincia
+              ? ' - ' + this.cabecera?.adquiriente?.direccion?.provincia
+              : '') +
+            (this.cabecera?.adquiriente?.direccion?.departamento
+              ? ' - ' + this.cabecera?.adquiriente?.direccion?.departamento
+              : ''),
+        )
+        .agregarDistrito('')
+        .agregarProvincia('')
+        .agregarDepartamento('');
     }
     return servicio.generar(this, path!);
   }
@@ -144,7 +160,7 @@ class Direccion {
   }
 
   private _descripcion?: string;
-  public get description(): string | undefined {
+  public get descripcion(): string | undefined {
     return this._descripcion;
   }
   public agregarDescripcion(descripcion?: string): Direccion {
@@ -895,7 +911,7 @@ export class Cuota {
   }
 }
 
-class Adicional {
+export class Adicional {
   private _codigo?: string;
   public get codigo(): string | undefined {
     return this._codigo;
