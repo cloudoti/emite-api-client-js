@@ -53,7 +53,7 @@ export class Documento {
     if (!this.cabecera?.tipoMoneda) {
       errores.push('Debe agregar el tipo de moneda');
     }
-    if (this.cabecera?.tipoMoneda === 'PEN' && !this.cabecera?.tipoCambio) {
+    if (this.cabecera?.tipoMoneda !== 'PEN' && !this.cabecera?.tipoCambio) {
       errores.push('Debe agregar el tipo de cambio');
     }
     if (!this.cabecera?.adquiriente) {

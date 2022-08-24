@@ -1,26 +1,28 @@
 {
   "name": "emite-api-client-js",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "calculo y consumo de la API Emite",
   "main": "dist/emite-api.js",
   "files": [
     "dist/**/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "format": "prettier --write \"libreria/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "test": "npm build && jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "decimal.js": "^10.3.1",
-    "@nestjs/common": "^7.6.15",
-    "rxjs": "^7.2.0"
+    "axios": "^0.27.2",
+    "decimal.js": "^10.3.1"
   },
   "devDependencies": {
+    "@types/jest": "^28.1.7",
+    "jest": "^28.1.3",
     "prettier": "^2.2.1",
+    "ts-jest": "^28.0.8",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.2.3"

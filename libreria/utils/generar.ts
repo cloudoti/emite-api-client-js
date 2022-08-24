@@ -1,32 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import EmiteApi from '../../emite-api';
 import { Documento } from './documento';
 
-const axiosInstance = axios.create({
-  baseURL: '',
-  headers: {},
-});
-
-@Injectable()
 export class Generar {
-  async generar(documento: Documento, path: string): Promise<{ codigo: number; respuesta: string }> {
-    const configuracion = {
+  private axiosInstance?: AxiosInstance;
+
+  constructor() {
+    this.axiosInstance = axios.create({
       baseURL: EmiteApi.configuracion.urlApi,
       headers: {
         'Content-Type': 'application/json',
-        'api-key': EmiteApi.configuracion.emiteKey,
+        'api-key': EmiteApi.configuracion.emiteKey!,
       },
-    };
+    });
+  }
+
+  async generar(documento: Documento, path: string): Promise<{ codigo: number; respuesta: string }> {
     const parametros = {
-      documento,
+      documento: documento.toJSON(),
       configuracion: {
         noRetornarXml: true,
         noRetornarCdr: true,
       },
     };
-    return axiosInstance
-      .post(path, parametros, configuracion)
+    return this.axiosInstance!.post(path, parametros)
       .then((response: { data: any }) => {
         return { codigo: 200, respuesta: JSON.stringify(response.data) };
       })
