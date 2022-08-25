@@ -1,5 +1,5 @@
 import { Decimal } from 'decimal.js';
-import { Igv } from './documento';
+import { Detalle, Igv } from './documento';
 import EmiteApi from '../../emite-api';
 
 export function validarNumero(numero?: string): string {
@@ -95,4 +95,135 @@ export function obtenerIgv(montoConIgv: string, afectacion: string): Igv {
   } else {
     return Igv.crear().agregarMonto(new Decimal(0.0).toFixed(2)).agregarCodigoTipoAfectacionIgv(afectacion);
   }
+}
+
+export function validarJson(documento: any): string[] {
+  const errores: string[] = [];
+  if (!documento) {
+    errores.push('El documento esta vacío');
+    return errores;
+  }
+  if (!documento.cabecera) {
+    errores.push('El documento no tiene cabecera');
+    return errores;
+  }
+  if (!documento.detalle) {
+    errores.push('El documento no tiene detalles');
+    return errores;
+  }
+  if (!documento.cabecera.tipoOperacion) {
+    errores.push('Debe agregar el tipo de operación');
+  }
+  if (!documento.cabecera.tipoDocumento) {
+    errores.push('Debe agregar el tipo de documento a generar');
+  }
+  if (!documento.cabecera.tipoMoneda) {
+    errores.push('Debe agregar el tipo de moneda');
+  }
+  if (documento.cabecera.tipoMoneda && documento.cabecera.tipoMoneda !== 'PEN' && !documento.cabecera.tipoCambio) {
+    errores.push('Debe agregar el tipo de cambio');
+  }
+  if (!documento.cabecera.adquiriente) {
+    errores.push('Debe agregar un cliente a la venta');
+  }
+  if (documento.cabecera.adquiriente && !documento.cabecera.adquiriente.tipoIdentidad) {
+    errores.push('Debe agregar el tipo de documento del cliente');
+  }
+  if (documento.cabecera.adquiriente && !documento.cabecera.adquiriente.numeroIdentidad) {
+    errores.push('Debe agregar el número de documento del cliente');
+  }
+  if (!documento.cabecera.adquiriente && !documento.cabecera.adquiriente.direccion) {
+    errores.push('Debe agregar la dirección del adquiriente');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    documento.cabecera.tipoDocumento === '03' &&
+    documento.cabecera.adquiriente &&
+    documento.cabecera.adquiriente.tipoIdentidad &&
+    documento.cabecera.adquiriente.tipoIdentidad === '6'
+  ) {
+    errores.push('El tipo de documento RUC es solo para facturas');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    documento.cabecera.tipoDocumento === '01' &&
+    documento.cabecera.adquiriente &&
+    documento.cabecera.adquiriente.tipoIdentidad &&
+    documento.cabecera.adquiriente.tipoIdentidad !== '6'
+  ) {
+    errores.push('Las facturas deben estar dirigidas a un RUC');
+  }
+  if (documento.detalle.length === 0) {
+    errores.push('Debe tener al menos un producto agregado a la venta');
+  }
+  documento.detalle.forEach((item: any, index: number) => {
+    if (!item.cantidad) {
+      errores.push('Producto #' + (index + 1) + ', No tiene cantidad');
+    }
+    if (!item.unidadMedida) {
+      errores.push('Producto #' + (index + 1) + ', No tiene unidad de medida');
+    }
+    if (!item.descripcion) {
+      errores.push('Producto #' + (index + 1) + ', No tiene descripcion');
+    }
+    if (!item.valorUnitario) {
+      errores.push('Producto #' + (index + 1) + ', No tiene valor unitario');
+    }
+    if (!item.valorVenta) {
+      errores.push('Producto #' + (index + 1) + ', No tiene valor de venta');
+    }
+    if (!item.precioVentaUnitario) {
+      errores.push('Producto #' + (index + 1) + ', No tiene precio de venta unitario');
+    }
+    if (!item.igv) {
+      errores.push('Producto #' + (index + 1) + ', No tiene IGV');
+    }
+    if (item.igv && !item.igv.monto) {
+      errores.push('Producto #' + (index + 1) + ', No tiene monto IGV');
+    }
+    if (item.igv && !item.igv.codigoTipoAfectacionIgv) {
+      errores.push('Producto #' + (index + 1) + ', No tiene tipo de afectación de IGV');
+    }
+    if (!item.importeTotal) {
+      errores.push('Producto #' + (index + 1) + ', No tiene importe total');
+    }
+    if (
+      item.igv &&
+      (item.igv.codigoTipoAfectacionIgv === '10' ||
+        item.igv.codigoTipoAfectacionIgv === '20' ||
+        item.igv.codigoTipoAfectacionIgv === '30' ||
+        item.igv.codigoTipoAfectacionIgv === '40') &&
+      new Decimal(item.importeTotal ?? '0').lessThanOrEqualTo(new Decimal(0))
+    ) {
+      errores.push('Producto #' + (index + 1) + ', No puede costar 0.00');
+    }
+  });
+  if (!documento.cabecera.importes) {
+    errores.push('El documento no tiene importes totales');
+  }
+  if (!documento.cabecera.igv) {
+    errores.push('El documento no tiene IGV');
+  }
+  if (
+    documento.cabecera.importes &&
+    documento.cabecera.igv &&
+    new Decimal(documento.cabecera.importes.importeTotal ?? '0').lessThanOrEqualTo(new Decimal(0)) &&
+    new Decimal(documento.cabecera.operacionGratuita ?? '0').lessThanOrEqualTo(new Decimal(0)) &&
+    new Decimal(documento.cabecera.igv.montoGratuito ?? '0').lessThanOrEqualTo(new Decimal(0))
+  ) {
+    errores.push('La venta no puede ser menor o igual a 0.00');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    documento.cabecera.tipoDocumento === '03' &&
+    documento.cabecera.adquiriente &&
+    documento.cabecera.adquiriente.tipoIdentidad === '0' &&
+    documento.cabecera.importes &&
+    new Decimal(documento.cabecera.importes.importeTotal ?? '0').greaterThanOrEqualTo(
+      new Decimal(EmiteApi.configuracion.montoMinimoBoleta!),
+    )
+  ) {
+    errores.push('Boletas de 700 S/ o mas no pueden ir a Público General');
+  }
+  return errores;
 }

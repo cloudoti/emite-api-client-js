@@ -76,30 +76,30 @@ export class Documento {
     }
     this.detalle.forEach((item: Detalle, index: number) => {
       if (
-        item.igv?.codigoTipoAfectacionIgv !== '10' &&
-        item.igv?.codigoTipoAfectacionIgv !== '20' &&
-        item.igv?.codigoTipoAfectacionIgv !== '30' &&
-        item.igv?.codigoTipoAfectacionIgv !== '40' &&
-        new Decimal(item.importeTotal ?? '0').lessThan(new Decimal(0))
+        (item.igv?.codigoTipoAfectacionIgv === '10' ||
+          item.igv?.codigoTipoAfectacionIgv === '20' ||
+          item.igv?.codigoTipoAfectacionIgv === '30' ||
+          item.igv?.codigoTipoAfectacionIgv === '40') &&
+        new Decimal(item.importeTotal ?? '0').lessThanOrEqualTo(new Decimal(0))
       ) {
         errores.push('Producto #' + (index + 1) + ', No puede costar 0.00');
       }
     });
     if (
-      new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(new Decimal(0)) &&
-      new Decimal(this.cabecera?.operacionGratuita ?? '0').lessThan(new Decimal(0)) &&
-      new Decimal(this.cabecera?.igv?.montoGratuito ?? '0').lessThan(new Decimal(0))
+      new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThanOrEqualTo(new Decimal(0)) &&
+      new Decimal(this.cabecera?.operacionGratuita ?? '0').lessThanOrEqualTo(new Decimal(0)) &&
+      new Decimal(this.cabecera?.igv?.montoGratuito ?? '0').lessThanOrEqualTo(new Decimal(0))
     ) {
       errores.push('La venta no puede ser menor o igual a 0.00');
     }
     if (
       this.cabecera?.tipoDocumento === '03' &&
       this.cabecera?.adquiriente?.tipoIdentidad === '0' &&
-      new Decimal(this.cabecera?.importes?.importeTotal ?? '0').lessThan(
+      new Decimal(this.cabecera?.importes?.importeTotal ?? '0').greaterThanOrEqualTo(
         new Decimal(EmiteApi.configuracion.montoMinimoBoleta!),
       )
     ) {
-      errores.push('Boletas de 700 S/ o mas no puede ir a Público General');
+      errores.push('Boletas de 700 S/ o mas no pueden ir a Público General');
     }
     return errores;
   }
@@ -125,27 +125,7 @@ export class Documento {
       return { codigo: 400, respuesta: JSON.stringify(errores) };
     }
     const servicio = new Generar();
-    let path = EmiteApi.configuracion.urlRegistrarFactura;
-    if (this.cabecera?.tipoDocumento === '03') {
-      path = EmiteApi.configuracion.urlRegistrarBoleta;
-      this.cabecera?.adquiriente?.direccion
-        ?.agregarDescripcion(
-          this.cabecera?.adquiriente?.direccion?.descripcion +
-            (this.cabecera?.adquiriente?.direccion?.distrito
-              ? ' ' + this.cabecera?.adquiriente?.direccion?.distrito
-              : '') +
-            (this.cabecera?.adquiriente?.direccion?.provincia
-              ? ' - ' + this.cabecera?.adquiriente?.direccion?.provincia
-              : '') +
-            (this.cabecera?.adquiriente?.direccion?.departamento
-              ? ' - ' + this.cabecera?.adquiriente?.direccion?.departamento
-              : ''),
-        )
-        .agregarDistrito('')
-        .agregarProvincia('')
-        .agregarDepartamento('');
-    }
-    return servicio.generar(this, path!);
+    return servicio.generar(this);
   }
 }
 
@@ -309,6 +289,7 @@ export class Adquiriente {
 
   public toJSON() {
     return {
+      id: this._id,
       numeroIdentidad: this._numeroIdentidad,
       tipoIdentidad: this._tipoIdentidad,
       nombre: this._nombre,
@@ -1341,7 +1322,15 @@ export class Cabecera {
     return this._adicionales;
   }
   public agregarAdicionales(adicional: Adicional): Cabecera {
-    this._adicionales?.push(adicional);
+    let exists: boolean = false;
+    this._adicionales.forEach((adi) => {
+      if (adi.codigo === adicional.codigo) {
+        exists = true;
+      }
+    });
+    if (!exists) {
+      this._adicionales?.push(adicional);
+    }
     return this;
   }
 
@@ -1369,10 +1358,12 @@ export class Cabecera {
 
   public toJSON() {
     return {
+      tipoDocumento: this._tipoDocumento,
       codigoEstablecimiento: this._codigoEstablecimiento,
       fechaEmision: this._fechaEmision,
       horaEmision: this._horaEmision,
       tipoMoneda: this._tipoMoneda,
+      tipoCambio: this._tipoCambio,
       serie: this._serie,
       correlativo: this._correlativo,
       tipoOperacion: this._tipoOperacion,
@@ -1763,7 +1754,15 @@ export class Detalle {
     return this._adicionales;
   }
   public agregarAdicionales(adicional: Adicional): Detalle {
-    this._adicionales.push(adicional);
+    let exists: boolean = false;
+    this._adicionales.forEach((adi) => {
+      if (adi.codigo === adicional.codigo) {
+        exists = true;
+      }
+    });
+    if (!exists) {
+      this._adicionales?.push(adicional);
+    }
     return this;
   }
 
@@ -1789,6 +1788,7 @@ export class Detalle {
   public toJSON() {
     return {
       orden: this.orden,
+      id: this._id,
       unidadMedida: this.unidadMedida,
       cantidad: this.cantidad,
       descripcion: this.descripcion,

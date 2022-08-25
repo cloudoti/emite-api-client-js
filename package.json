@@ -1,16 +1,17 @@
 {
   "name": "emite-api-client-js",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "calculo y consumo de la API Emite",
   "main": "dist/emite-api.js",
   "files": [
     "dist/**/*"
   ],
   "scripts": {
+    "test": "mocha --reporter spec --require ts-node/register './**/*.test.ts'",
     "build": "tsc",
     "format": "prettier --write \"libreria/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "test": "npm build && jest"
+    "jest": "npm build && jest"
   },
   "author": "",
   "license": "ISC",
