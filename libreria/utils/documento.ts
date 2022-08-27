@@ -1846,12 +1846,7 @@ export class Detalle {
         );
       }
 
-      this.agregarValorVenta(
-        new Decimal(this._cantidad)
-          .mul(this._valorUnitario!)
-          .sub(descuentoABI)
-          .toFixed(EmiteApi.configuracion.cantidadDecimales),
-      );
+      this.agregarValorVenta(new Decimal(this._cantidad).mul(this._valorUnitario!).sub(descuentoABI).toFixed(2));
 
       this.agregarImporteTotal(obterMontoConIgv(this._valorVenta!, this._codigoTipoAfectacionIgv));
       this.agregarIgv(obtenerIgv(this._importeTotal!, this._codigoTipoAfectacionIgv));
