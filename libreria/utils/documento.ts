@@ -10,7 +10,7 @@ import {
   obterMontoConIgv,
 } from './funciones';
 import { Generar } from './generar';
-import { CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
+import { ApiError, CodigoDetraccion, CodigoTipoAfectacionIgv } from './types';
 import OpcionesPredeterminadas from '../opciones/predeterminados';
 
 export class Documento {
@@ -115,14 +115,14 @@ export class Documento {
     };
   }
 
-  public async generar(): Promise<{ codigo: number; respuesta: string }> {
+  public async generar(): Promise<any> {
     const errores: string[] = [];
     if (!EmiteApi.configuracion.emiteKey) {
       errores.push('No tiene configurado el EMITE_KEY');
     }
     errores.push(...this.validar());
     if (errores.length > 0) {
-      return { codigo: 400, respuesta: JSON.stringify(errores) };
+      throw new ApiError(400, errores);
     }
     const servicio = new Generar();
     return servicio.generar(this);

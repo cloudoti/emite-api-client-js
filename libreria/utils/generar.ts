@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import EmiteApi from '../../emite-api';
 import { validarJson } from './funciones';
+import { ApiError } from './types';
 
 export class Generar {
   private axiosInstance?: AxiosInstance;
@@ -10,12 +11,12 @@ export class Generar {
       baseURL: EmiteApi.configuracion.urlApi,
       headers: {
         'Content-Type': 'application/json',
-        'emite_key': EmiteApi.configuracion.emiteKey!,
+        emite_key: EmiteApi.configuracion.emiteKey!,
       },
     });
   }
 
-  async generar(documento: any, json?: boolean): Promise<{ codigo: number; respuesta: string }> {
+  async generar(documento: any, json?: boolean): Promise<any> {
     let path: string = EmiteApi.configuracion.urlRegistrarFactura!;
     if (!json) {
       if (documento.cabecera?.tipoDocumento === '03') {
@@ -45,12 +46,12 @@ export class Generar {
       }
       errores.push(...validarJson(documento));
       if (errores.length > 0) {
-        return { codigo: 400, respuesta: JSON.stringify(errores) };
+        throw new ApiError(400, errores);
       }
       if (documento.cabecera.tipoDocumento === '03') {
         path = EmiteApi.configuracion.urlRegistrarBoleta!;
-        documento.cabecera.adquiriente.direccion =
-          documento.cabecera.adquiriente.direccion +
+        documento.cabecera.adquiriente.direccion.descripcion =
+          documento.cabecera.adquiriente.direccion.descripcion +
           (documento.cabecera.adquiriente.direccion.distrito
             ? ' ' + documento.cabecera.adquiriente.direccion.distrito
             : '') +
@@ -61,8 +62,8 @@ export class Generar {
             ? ' - ' + documento.cabecera.adquiriente.direccion.departamento
             : '');
         delete documento.cabecera.adquiriente.direccion.distrito;
-        delete documento.cabecera.adquiriente.direccion.distrito;
-        delete documento.cabecera.adquiriente.direccion.distrito;
+        delete documento.cabecera.adquiriente.direccion.provincia;
+        delete documento.cabecera.adquiriente.direccion.departamento;
       }
     }
     delete documento.cabecera.adquiriente.id;
@@ -79,19 +80,10 @@ export class Generar {
     };
     return this.axiosInstance!.post(path, parametros)
       .then((response: any) => {
-        return { codigo: 200, respuesta: JSON.stringify(response) };
+        return response.data;
       })
       .catch((error: any) => {
-        return { codigo: 400, respuesta: JSON.stringify(error) };
+        throw new ApiError(error.response.status, error.response.data);
       });
-    /*
-    return this.axiosInstance!.post(path, parametros)
-        .then((response: { data: any }) => {
-          return { codigo: 200, respuesta: JSON.stringify(response.data) };
-        })
-        .catch((error: { response: { data: { error: any } } }) => {
-          return { codigo: 400, respuesta: JSON.stringify(error.response.data.error) };
-        });
-    */
   }
 }

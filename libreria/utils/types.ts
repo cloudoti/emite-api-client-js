@@ -55,3 +55,13 @@ export type CodigoDetraccion =
   | '035'
   | '031'
   | '034';
+
+export class ApiError extends Error {
+  public status: number;
+  public data: any;
+  constructor(status: number, data: any) {
+    super(`Response status: ${status}`);
+    this.status = status;
+    this.data = data;
+  }
+}
