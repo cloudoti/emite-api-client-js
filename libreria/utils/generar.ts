@@ -10,7 +10,7 @@ export class Generar {
       baseURL: EmiteApi.configuracion.urlApi,
       headers: {
         'Content-Type': 'application/json',
-        'api-key': EmiteApi.configuracion.emiteKey!,
+        'emite_key': EmiteApi.configuracion.emiteKey!,
       },
     });
   }
@@ -33,14 +33,18 @@ export class Generar {
                 ? ' - ' + documento.cabecera?.adquiriente?.direccion?.departamento
                 : ''),
           )
-          .agregarDistrito('')
-          .agregarProvincia('')
-          .agregarDepartamento('');
+          .agregarDistrito()
+          .agregarProvincia()
+          .agregarDepartamento();
       }
       documento = documento.toJSON();
     } else {
-      const errores = validarJson(documento);
-      if (errores && errores.length > 0) {
+      const errores: string[] = [];
+      if (!EmiteApi.configuracion.emiteKey) {
+        errores.push('No tiene configurado el EMITE_KEY');
+      }
+      errores.push(...validarJson(documento));
+      if (errores.length > 0) {
         return { codigo: 400, respuesta: JSON.stringify(errores) };
       }
       if (documento.cabecera.tipoDocumento === '03') {
@@ -74,11 +78,20 @@ export class Generar {
       },
     };
     return this.axiosInstance!.post(path, parametros)
-      .then((response: { data: any }) => {
-        return { codigo: 200, respuesta: JSON.stringify(response.data) };
+      .then((response: any) => {
+        return { codigo: 200, respuesta: JSON.stringify(response) };
       })
-      .catch((error: { response: { data: { error: any } } }) => {
-        return { codigo: 400, respuesta: JSON.stringify(error.response.data.error) };
+      .catch((error: any) => {
+        return { codigo: 400, respuesta: JSON.stringify(error) };
       });
+    /*
+    return this.axiosInstance!.post(path, parametros)
+        .then((response: { data: any }) => {
+          return { codigo: 200, respuesta: JSON.stringify(response.data) };
+        })
+        .catch((error: { response: { data: { error: any } } }) => {
+          return { codigo: 400, respuesta: JSON.stringify(error.response.data.error) };
+        });
+    */
   }
 }

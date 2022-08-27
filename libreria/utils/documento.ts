@@ -1377,6 +1377,7 @@ export class Cabecera {
       igv: this.igv,
       importes: this.importes,
       montoEnLetras: this._montoEnLetras,
+      descuentoGlobal: this._descuentoGlobal,
       detraccion: this.detraccion,
       retencionIgv: this.retencionesIgv,
       formaPago: this.formaPago,
@@ -1787,20 +1788,21 @@ export class Detalle {
 
   public toJSON() {
     return {
-      orden: this.orden,
+      orden: this._orden,
       id: this._id,
-      unidadMedida: this.unidadMedida,
-      cantidad: this.cantidad,
-      descripcion: this.descripcion,
-      multiDescripcion: this.multiDescripcion,
-      valorUnitario: this.valorUnitario,
-      valorVenta: this.valorVenta,
-      montoDescuento: this.montoDescuento,
-      importeTotal: this.importeTotal,
-      igv: this.igv,
-      icbper: this.icbper,
-      precioVentaUnitario: this.precioVentaUnitario,
-      adicionales: this.adicionales.length > 0 ? this.adicionales : undefined,
+      unidadMedida: this._unidadMedida,
+      cantidad: this._cantidad,
+      codigoProducto: this._codigoProducto,
+      descripcion: this._descripcion,
+      multiDescripcion: this._multiDescripcion,
+      valorUnitario: this._valorUnitario,
+      valorVenta: this._valorVenta,
+      montoDescuento: this._montoDescuento,
+      importeTotal: this._importeTotal,
+      igv: this._igv,
+      icbper: this._icbper,
+      precioVentaUnitario: this._precioVentaUnitario,
+      adicionales: this._adicionales.length > 0 ? this._adicionales : undefined,
     };
   }
 
