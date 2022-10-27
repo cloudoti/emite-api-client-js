@@ -28,6 +28,8 @@ const OpcionesPredeterminadas: OpcionesPredeterminadas = {
   urlApiProduccion: 'https://api.emite.pe',
   urlRegistrarFactura: '/factura/registrar',
   urlRegistrarBoleta: '/boleta/registrar',
+  urlRegistrarNotaCredito: '/nota-credito/registrar',
+  urlRegistrarNotaDebito: '/nota-debito/registrar',
   adicionalCodigoDescuentoUnitario: 'DESCUENTO_UNITARIO',
   adicionalCodigoFormaPago: 'TIPO_PAGO',
   adicionalValorFormaPagoContado: 'CONTADO',

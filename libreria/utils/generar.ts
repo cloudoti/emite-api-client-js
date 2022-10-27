@@ -21,6 +21,18 @@ export class Generar {
     if (!json) {
       if (documento.cabecera?.tipoDocumento === '03') {
         path = EmiteApi.configuracion.urlRegistrarBoleta!;
+      }
+      if (documento.cabecera?.tipoDocumento === '07') {
+        path = EmiteApi.configuracion.urlRegistrarNotaCredito!;
+      }
+      if (documento.cabecera?.tipoDocumento === '08') {
+        path = EmiteApi.configuracion.urlRegistrarNotaDebito!;
+      }
+      if (
+        documento.cabecera?.tipoDocumento === '03' ||
+        ((documento.cabecera?.tipoDocumento === '07' || documento.cabecera?.tipoDocumento === '08') &&
+          documento.cabecera?.documentosModificados[0]?.tipo === '03')
+      ) {
         documento.cabecera?.adquiriente?.direccion
           ?.agregarDescripcion(
             documento.cabecera?.adquiriente?.direccion?.descripcion +
@@ -50,6 +62,18 @@ export class Generar {
       }
       if (documento.cabecera.tipoDocumento === '03') {
         path = EmiteApi.configuracion.urlRegistrarBoleta!;
+      }
+      if (documento.cabecera.tipoDocumento === '07') {
+        path = EmiteApi.configuracion.urlRegistrarNotaCredito!;
+      }
+      if (documento.cabecera.tipoDocumento === '08') {
+        path = EmiteApi.configuracion.urlRegistrarNotaDebito!;
+      }
+      if (
+        documento.cabecera.tipoDocumento === '03' ||
+        ((documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
+          documento.cabecera.documentosModificados[0].tipo === '03')
+      ) {
         documento.cabecera.adquiriente.direccion.descripcion =
           documento.cabecera.adquiriente.direccion.descripcion +
           (documento.cabecera.adquiriente.direccion.distrito

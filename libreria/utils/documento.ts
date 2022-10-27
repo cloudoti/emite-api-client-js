@@ -923,12 +923,45 @@ export class Adicional {
   }
 }
 
+// Para notas de crédito
+export class DocumentoModificado {
+  private _numero?: string;
+  public get numero(): string | undefined {
+    return this._numero;
+  }
+  public agregarNumero(numero: string): DocumentoModificado {
+    this._numero = numero;
+    return this;
+  }
+
+  private _tipo?: '01' | '03' | undefined;
+  public get tipo(): string | undefined {
+    return this._tipo;
+  }
+  public agregarTipo(tipo: '01' | '03'): DocumentoModificado {
+    this._tipo = tipo;
+    return this;
+  }
+
+  public static crear(): DocumentoModificado {
+    return new DocumentoModificado();
+  }
+
+  public toJSON() {
+    return {
+      numero: this._numero,
+      tipo: this._tipo,
+    };
+  }
+}
+// Para notas de crédito
+
 export class Cabecera {
   private _tipoDocumento?: string;
   public get tipoDocumento(): string | undefined {
     return this._tipoDocumento;
   }
-  public agregarTipoDocumento(tipoDocumento: '01' | '03'): Cabecera {
+  public agregarTipoDocumento(tipoDocumento: '01' | '03' | '07' | '08'): Cabecera {
     this._tipoDocumento = tipoDocumento;
     return this;
   }
@@ -1352,6 +1385,43 @@ export class Cabecera {
     return this;
   }
 
+  // Para notas de crédito
+  private _tipoNota?: string;
+  public get tipoNota(): string | undefined {
+    return this._tipoNota;
+  }
+  public agregarTipoNota(tipoNota: string): Cabecera {
+    this._tipoNota = tipoNota;
+    return this;
+  }
+
+  private _motivo?: string;
+  public get motivo(): string | undefined {
+    return this._motivo;
+  }
+  public agregarMotivo(motivo: string): Cabecera {
+    this._motivo = motivo;
+    return this;
+  }
+
+  private _documentosModificados: DocumentoModificado[] = [];
+  public get documentosModificados(): DocumentoModificado[] {
+    return this._documentosModificados;
+  }
+  public agregarDocumentosModificados(documentoModificado: DocumentoModificado): Cabecera {
+    let exists: boolean = false;
+    this._documentosModificados.forEach((dm) => {
+      if (dm.numero === documentoModificado.numero && dm.tipo === documentoModificado.tipo) {
+        exists = true;
+      }
+    });
+    if (!exists) {
+      this._documentosModificados?.push(documentoModificado);
+    }
+    return this;
+  }
+  // Para notas de crédito
+
   public static crear(): Cabecera {
     return new Cabecera();
   }
@@ -1384,6 +1454,9 @@ export class Cabecera {
       cuotas: this._cuotasPago.length > 0 ? this.cuotasPago : undefined,
       guiasRemision: this._guiasRemision.length > 0 ? this.guiasRemision : undefined,
       adicionales: this._adicionales.length > 0 ? this.adicionales : undefined,
+      tipoNota: this._tipoNota,
+      motivo: this._motivo,
+      documentosModificados: this._documentosModificados,
     };
   }
 

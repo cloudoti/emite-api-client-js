@@ -8,6 +8,8 @@ export interface Configuracion extends Opciones {
   urlApi?: string;
   urlRegistrarFactura?: string;
   urlRegistrarBoleta?: string;
+  urlRegistrarNotaCredito?: string;
+  urlRegistrarNotaDebito?: string;
   adicionalCodigoDescuentoUnitario: string;
   adicionalCodigoFormaPago: string;
   adicionalValorFormaPagoContado: string;
@@ -40,6 +42,8 @@ export function obtenerConfiguracion(opciones: Opciones): Configuracion {
     entornoPruebas: opciones.entornoPruebas || OpcionesPredeterminadas.entornoPruebas,
     urlRegistrarFactura: OpcionesPredeterminadas.urlRegistrarFactura,
     urlRegistrarBoleta: OpcionesPredeterminadas.urlRegistrarBoleta,
+    urlRegistrarNotaCredito: OpcionesPredeterminadas.urlRegistrarNotaCredito,
+    urlRegistrarNotaDebito: OpcionesPredeterminadas.urlRegistrarNotaDebito,
     adicionalCodigoDescuentoUnitario: OpcionesPredeterminadas.adicionalCodigoDescuentoUnitario,
     adicionalCodigoFormaPago: OpcionesPredeterminadas.adicionalCodigoFormaPago,
     adicionalValorFormaPagoContado: OpcionesPredeterminadas.adicionalValorFormaPagoContado,

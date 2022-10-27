@@ -111,17 +111,59 @@ export function validarJson(documento: any): string[] {
     errores.push('El documento no tiene detalles');
     return errores;
   }
-  if (!documento.cabecera.tipoOperacion) {
-    errores.push('Debe agregar el tipo de operación');
-  }
   if (!documento.cabecera.tipoDocumento) {
     errores.push('Debe agregar el tipo de documento a generar');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    (documento.cabecera.tipoDocumento === '01' || documento.cabecera.tipoDocumento === '03') &&
+    !documento.cabecera.tipoOperacion
+  ) {
+    errores.push('Debe agregar el tipo de operación');
   }
   if (!documento.cabecera.tipoMoneda) {
     errores.push('Debe agregar el tipo de moneda');
   }
-  if (documento.cabecera.tipoMoneda && documento.cabecera.tipoMoneda !== 'PEN' && !documento.cabecera.tipoCambio) {
+  if (
+    documento.cabecera.tipoDocumento &&
+    (documento.cabecera.tipoDocumento === '01' || documento.cabecera.tipoDocumento === '03') &&
+    documento.cabecera.tipoMoneda &&
+    documento.cabecera.tipoMoneda !== 'PEN' &&
+    !documento.cabecera.tipoCambio
+  ) {
     errores.push('Debe agregar el tipo de cambio');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    (documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
+    !documento.cabecera.tipoNota
+  ) {
+    errores.push('Debe agregar el tipo de nota');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    documento.cabecera.tipoDocumento === '07' &&
+    documento.cabecera.tipoNota !== '01'
+  ) {
+    errores.push('El tipo de nota no es válido o no se encuentra disponible');
+  }
+  if (documento.cabecera.tipoDocumento && documento.cabecera.tipoDocumento === '08') {
+    errores.push('La nota de débito aún no no se encuentra disponible');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    (documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
+    !documento.cabecera.motivo
+  ) {
+    errores.push('Debe agregar el motivo o sustento de la nota');
+  }
+  if (
+    documento.cabecera.tipoDocumento &&
+    (documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
+    (!documento.cabecera.documentosModificados ||
+      (documento.cabecera.documentosModificados && documento.cabecera.documentosModificados.length === 0))
+  ) {
+    errores.push('Debe agregar el documento a modificar');
   }
   if (!documento.cabecera.adquiriente) {
     errores.push('Debe agregar un cliente a la venta');
@@ -137,21 +179,29 @@ export function validarJson(documento: any): string[] {
   }
   if (
     documento.cabecera.tipoDocumento &&
-    documento.cabecera.tipoDocumento === '03' &&
+    (documento.cabecera.tipoDocumento === '03' ||
+      ((documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
+        documento.cabecera.documentosModificados &&
+        documento.cabecera.documentosModificados[0] &&
+        documento.cabecera.documentosModificados[0].tipo === '03')) &&
     documento.cabecera.adquiriente &&
     documento.cabecera.adquiriente.tipoIdentidad &&
     documento.cabecera.adquiriente.tipoIdentidad === '6'
   ) {
-    errores.push('El tipo de documento RUC es solo para facturas');
+    errores.push('El tipo de documento RUC es solo para facturas o notas de facturas');
   }
   if (
     documento.cabecera.tipoDocumento &&
-    documento.cabecera.tipoDocumento === '01' &&
+    (documento.cabecera.tipoDocumento === '01' ||
+      ((documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
+        documento.cabecera.documentosModificados &&
+        documento.cabecera.documentosModificados[0] &&
+        documento.cabecera.documentosModificados[0].tipo === '01')) &&
     documento.cabecera.adquiriente &&
     documento.cabecera.adquiriente.tipoIdentidad &&
     documento.cabecera.adquiriente.tipoIdentidad !== '6'
   ) {
-    errores.push('Las facturas deben estar dirigidas a un RUC');
+    errores.push('Las facturas o notas de facturas deben estar dirigidas a un RUC');
   }
   if (documento.detalle.length === 0) {
     errores.push('Debe tener al menos un producto agregado a la venta');
