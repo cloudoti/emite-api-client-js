@@ -44,17 +44,42 @@ export class Documento {
 
   public validar(): string[] {
     const errores: string[] = [];
-    if (!this.cabecera?.tipoOperacion) {
-      errores.push('Debe agregar el tipo de operación');
-    }
     if (!this.cabecera?.tipoDocumento) {
       errores.push('Debe agregar el tipo de documento a generar');
+    }
+    if (
+      (this.cabecera?.tipoDocumento === '01' || this.cabecera?.tipoDocumento === '03') &&
+      !this.cabecera?.tipoOperacion
+    ) {
+      errores.push('Debe agregar el tipo de operación');
     }
     if (!this.cabecera?.tipoMoneda) {
       errores.push('Debe agregar el tipo de moneda');
     }
-    if (this.cabecera?.tipoMoneda !== 'PEN' && !this.cabecera?.tipoCambio) {
+    if (
+      (this.cabecera?.tipoDocumento === '01' || this.cabecera?.tipoDocumento === '03') &&
+      this.cabecera?.tipoMoneda !== 'PEN' &&
+      !this.cabecera?.tipoCambio
+    ) {
       errores.push('Debe agregar el tipo de cambio');
+    }
+    if ((this.cabecera?.tipoDocumento === '07' || this.cabecera?.tipoDocumento === '08') && !this.cabecera?.tipoNota) {
+      errores.push('Debe agregar el tipo de nota');
+    }
+    if (this.cabecera?.tipoDocumento === '07' && this.cabecera?.tipoNota !== '01') {
+      errores.push('El tipo de nota no es válido o no se encuentra disponible');
+    }
+    if (this.cabecera?.tipoDocumento === '08') {
+      errores.push('La nota de débito aún no no se encuentra disponible');
+    }
+    if ((this.cabecera?.tipoDocumento === '07' || this.cabecera?.tipoDocumento === '08') && !this.cabecera?.motivo) {
+      errores.push('Debe agregar el motivo o sustento de la nota');
+    }
+    if (
+      (this.cabecera?.tipoDocumento === '07' || this.cabecera?.tipoDocumento === '08') &&
+      this.cabecera?.documentosModificados?.length === 0
+    ) {
+      errores.push('Debe agregar el documento a modificar');
     }
     if (!this.cabecera?.adquiriente) {
       errores.push('Debe agregar un cliente a la venta');
@@ -679,6 +704,15 @@ export class Igv {
     return this;
   }
 
+  private _factorTributo?: string;
+  public get factorTributo(): string | undefined {
+    return this._factorTributo;
+  }
+  public agregarFactorTributo(factorTributo?: string): Igv {
+    this._factorTributo = factorTributo;
+    return this;
+  }
+
   public static crear(): Igv {
     return new Igv();
   }
@@ -688,6 +722,7 @@ export class Igv {
       monto: this._monto,
       montoGratuito: this._montoGratuito,
       codigoTipoAfectacionIgv: this._codigoTipoAfectacionIgv,
+      factorTributo: this._factorTributo,
     };
   }
 }
@@ -1456,7 +1491,7 @@ export class Cabecera {
       adicionales: this._adicionales.length > 0 ? this.adicionales : undefined,
       tipoNota: this._tipoNota,
       motivo: this._motivo,
-      documentosModificados: this._documentosModificados,
+      documentosModificados: this._documentosModificados.length > 0 ? this._documentosModificados : undefined,
     };
   }
 

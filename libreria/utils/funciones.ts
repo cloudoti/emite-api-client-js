@@ -81,19 +81,27 @@ export function obtenerIgv(montoConIgv: string, afectacion: string): Igv {
   if (afectacion === '10') {
     return Igv.crear()
       .agregarMonto(new Decimal(montoConIgv).sub(new Decimal(obtenerMontoSinIgv(montoConIgv, afectacion))).toFixed(2))
-      .agregarCodigoTipoAfectacionIgv(afectacion);
+      .agregarCodigoTipoAfectacionIgv(afectacion)
+      .agregarFactorTributo(new Decimal(EmiteApi.configuracion.porcentajeIgv!).toFixed(2));
   } else if (afectacion !== '10' && afectacion !== '20' && afectacion !== '30' && afectacion !== '40') {
     if (Number(afectacion) > 10 && Number(afectacion) < 20) {
       return Igv.crear()
         .agregarMontoGratuito(
           new Decimal(montoConIgv).sub(new Decimal(obtenerMontoSinIgv(montoConIgv, afectacion))).toFixed(2),
         )
-        .agregarCodigoTipoAfectacionIgv(afectacion);
+        .agregarCodigoTipoAfectacionIgv(afectacion)
+        .agregarFactorTributo(new Decimal(EmiteApi.configuracion.porcentajeIgv!).toFixed(2));
     } else {
-      return Igv.crear().agregarMontoGratuito(new Decimal(0.0).toFixed(2)).agregarCodigoTipoAfectacionIgv(afectacion);
+      return Igv.crear()
+        .agregarMontoGratuito(new Decimal(0.0).toFixed(2))
+        .agregarCodigoTipoAfectacionIgv(afectacion)
+        .agregarFactorTributo(new Decimal(EmiteApi.configuracion.porcentajeIgv!).toFixed(2));
     }
   } else {
-    return Igv.crear().agregarMonto(new Decimal(0.0).toFixed(2)).agregarCodigoTipoAfectacionIgv(afectacion);
+    return Igv.crear()
+      .agregarMonto(new Decimal(0.0).toFixed(2))
+      .agregarCodigoTipoAfectacionIgv(afectacion)
+      .agregarFactorTributo(new Decimal(EmiteApi.configuracion.porcentajeIgv!).toFixed(2));
   }
 }
 
@@ -179,11 +187,7 @@ export function validarJson(documento: any): string[] {
   }
   if (
     documento.cabecera.tipoDocumento &&
-    (documento.cabecera.tipoDocumento === '03' ||
-      ((documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
-        documento.cabecera.documentosModificados &&
-        documento.cabecera.documentosModificados[0] &&
-        documento.cabecera.documentosModificados[0].tipo === '03')) &&
+    documento.cabecera.tipoDocumento === '03' &&
     documento.cabecera.adquiriente &&
     documento.cabecera.adquiriente.tipoIdentidad &&
     documento.cabecera.adquiriente.tipoIdentidad === '6'
@@ -192,11 +196,7 @@ export function validarJson(documento: any): string[] {
   }
   if (
     documento.cabecera.tipoDocumento &&
-    (documento.cabecera.tipoDocumento === '01' ||
-      ((documento.cabecera.tipoDocumento === '07' || documento.cabecera.tipoDocumento === '08') &&
-        documento.cabecera.documentosModificados &&
-        documento.cabecera.documentosModificados[0] &&
-        documento.cabecera.documentosModificados[0].tipo === '01')) &&
+    documento.cabecera.tipoDocumento === '01' &&
     documento.cabecera.adquiriente &&
     documento.cabecera.adquiriente.tipoIdentidad &&
     documento.cabecera.adquiriente.tipoIdentidad !== '6'
