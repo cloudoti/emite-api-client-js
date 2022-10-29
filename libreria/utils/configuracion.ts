@@ -14,6 +14,7 @@ export interface Configuracion extends Opciones {
   adicionalCodigoFormaPago: string;
   adicionalValorFormaPagoContado: string;
   adicionalValorFormaPagoCredito: string;
+  adicionalPorcentajeIgv: string;
 }
 
 export function obtenerConfiguracion(opciones: Opciones): Configuracion {
@@ -48,6 +49,7 @@ export function obtenerConfiguracion(opciones: Opciones): Configuracion {
     adicionalCodigoFormaPago: OpcionesPredeterminadas.adicionalCodigoFormaPago,
     adicionalValorFormaPagoContado: OpcionesPredeterminadas.adicionalValorFormaPagoContado,
     adicionalValorFormaPagoCredito: OpcionesPredeterminadas.adicionalValorFormaPagoCredito,
+    adicionalPorcentajeIgv: OpcionesPredeterminadas.adicionalPorcentajeIgv,
   };
   configuracion.valorIgv = new Decimal(configuracion.porcentajeIgv!).div(new Decimal(100));
   configuracion.valorRetencionIgv = new Decimal(configuracion.porcentajeRetencionIgv!).div(new Decimal(100));

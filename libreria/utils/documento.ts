@@ -1681,26 +1681,33 @@ export class Cabecera {
       );
     }
 
-    this.agregarFormaPago(FormaPago.crear().agregarTipo('1'));
-    if (this._tipoFormaPago === '2') {
-      this.formaPago
-        ?.agregarTipo(this._tipoFormaPago)
-        .agregarMonto(total.sub(montoDetraccion).sub(montoRetencionIgv).toFixed(2));
-    }
-    if (this.formaPago?.tipo === '1') {
-      this.agregarAdicionales(
-        Adicional.crear()
-          .agregarCodigo(EmiteApi.configuracion.adicionalCodigoFormaPago)
-          .agregarValor(EmiteApi.configuracion.adicionalValorFormaPagoContado),
-      );
-    } else {
-      this.agregarAdicionales(
-        Adicional.crear()
-          .agregarCodigo(EmiteApi.configuracion.adicionalCodigoFormaPago)
-          .agregarValor(EmiteApi.configuracion.adicionalValorFormaPagoCredito),
-      );
+    if (this._tipoDocumento === '01') {
+      this.agregarFormaPago(FormaPago.crear().agregarTipo('1'));
+      if (this._tipoFormaPago === '2') {
+        this.formaPago
+          ?.agregarTipo(this._tipoFormaPago)
+          .agregarMonto(total.sub(montoDetraccion).sub(montoRetencionIgv).toFixed(2));
+      }
+      if (this.formaPago?.tipo === '1') {
+        this.agregarAdicionales(
+          Adicional.crear()
+            .agregarCodigo(EmiteApi.configuracion.adicionalCodigoFormaPago)
+            .agregarValor(EmiteApi.configuracion.adicionalValorFormaPagoContado),
+        );
+      } else {
+        this.agregarAdicionales(
+          Adicional.crear()
+            .agregarCodigo(EmiteApi.configuracion.adicionalCodigoFormaPago)
+            .agregarValor(EmiteApi.configuracion.adicionalValorFormaPagoCredito),
+        );
+      }
     }
 
+    this.agregarAdicionales(
+      Adicional.crear()
+        .agregarCodigo(EmiteApi.configuracion.adicionalPorcentajeIgv)
+        .agregarValor(EmiteApi.configuracion.porcentajeIgv!.toString() + ' %'),
+    );
     return this;
   }
 }
