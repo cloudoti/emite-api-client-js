@@ -1,6 +1,6 @@
 {
   "name": "emite-api-client-js",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "calculo y consumo de la API Emite",
   "main": "dist/emite-api.js",
   "files": [

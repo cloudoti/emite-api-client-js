@@ -34,7 +34,7 @@ const OpcionesPredeterminadas: OpcionesPredeterminadas = {
   adicionalCodigoFormaPago: 'TIPO_PAGO',
   adicionalValorFormaPagoContado: 'CONTADO',
   adicionalValorFormaPagoCredito: 'CRÉDITO',
-  adicionalPorcentajeIgv: 'ORCENTAJE_IGV',
+  adicionalPorcentajeIgv: 'PORCENTAJE_IGV',
 };
 
 export default OpcionesPredeterminadas;

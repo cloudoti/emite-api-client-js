@@ -1468,6 +1468,7 @@ export class Cabecera {
       fechaEmision: this._fechaEmision,
       horaEmision: this._horaEmision,
       tipoMoneda: this._tipoMoneda,
+      simboloMoneda: this._simboloMoneda,
       tipoCambio: this._tipoCambio,
       serie: this._serie,
       correlativo: this._correlativo,
